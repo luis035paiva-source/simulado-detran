@@ -153,6 +153,21 @@ header.top{
   border-radius:12px;padding:12px 14px;color:#f7e6a8}
 .macete b{color:var(--amarelo)}
 
+/* ---------- veredito aprovado / reprovado ---------- */
+.veredito{
+  border-radius:var(--raio);padding:22px 18px;margin-bottom:14px;text-align:center;
+  border:2px solid var(--line);background:var(--card);
+  animation:pop .3s ease
+}
+.veredito.ok{background:linear-gradient(160deg,#0f3323,#123c29);border-color:var(--verde)}
+.veredito.no{background:linear-gradient(160deg,#3a1616,#42191b);border-color:var(--vermelho)}
+.vd-selo{font-size:30px;font-weight:900;letter-spacing:-.5px;line-height:1.1}
+.veredito.ok .vd-selo{color:var(--verde)}
+.veredito.no .vd-selo{color:#ff8f8f}
+.vd-num{font-size:17px;font-weight:800;margin-top:8px}
+.vd-txt{font-size:14.5px;color:var(--txt2);margin-top:6px}
+.veredito.ok .vd-txt,.veredito.no .vd-txt{color:#cfe0ee}
+
 /* ---------- resultado ---------- */
 .score{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
 .score small{font-size:18px;color:var(--txt2);font-weight:700;letter-spacing:0}
@@ -186,7 +201,8 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   <section id="telaInicio">
     <div class="card">
       <h1>Simulado de trânsito 🚦</h1>
-      <p class="muted">As questões são sorteadas a cada rodada. Errou? Você tenta de novo até acertar — e só então aparece a explicação completa da resposta.</p>
+      <p class="muted">A prova inteira é sorteada antes de começar: a cada rodada as questões saem em ordem aleatória. Errou? Você tenta de novo até acertar — e só então aparece a explicação completa da resposta.</p>
+      <p class="muted">No fim aparece o veredito: <b>21 acertos em 30 questões</b> é o mínimo para ser aprovado, igual à prova do DETRAN.</p>
       <p class="muted" id="totalBanco"></p>
     </div>
 
@@ -200,8 +216,11 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
       <div class="label">Quantas questões</div>
       <div class="chips" id="fQtd"></div>
 
+      <div class="label">Embaralhar as alternativas</div>
+      <div class="chips" id="fEmb"></div>
+
       <div style="height:20px"></div>
-      <button class="btn" id="btnIniciar">Começar simulado</button>
+      <button class="btn" id="btnIniciar">🎲 Sortear questões e começar</button>
       <div class="dica" id="dicaSel"></div>
     </div>
   </section>
@@ -221,6 +240,11 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
 
   <!-- ============ RESULTADO ============ -->
   <section id="telaFim" class="hidden">
+    <div class="veredito" id="veredito">
+      <div class="vd-selo" id="vdSelo"></div>
+      <div class="vd-num" id="vdNum"></div>
+      <div class="vd-txt" id="vdTxt"></div>
+    </div>
     <div class="card" style="text-align:center">
       <div class="score" id="scoreNum"></div>
       <p class="muted" id="scoreTxt"></p>
@@ -269,8 +293,9 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
                     25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
 
   /* ---------- estado ---------- */
-  let selCad = [], selTema = [], selQtd = 30;
+  let selCad = [], selTema = [], selQtd = 30, selEmb = false;
   let fila = [], idx = 0, acertosPrimeira = 0, errosTotais = 0, errados = [], tentouErrar = false;
+  const APROV = 0.7;   // 70% de acerto = 21 questões numa prova de 30
 
   /* ---------- filtros ---------- */
   const cadernos = [...new Set(QUESTOES.map(q => q.caderno))].sort((a,b)=>a-b);
@@ -309,6 +334,10 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
         montaFiltros();
       }));
     });
+    // embaralhar alternativas
+    const ec = $("fEmb"); ec.innerHTML = "";
+    ec.appendChild(chip("Não","igual ao caderno", !selEmb, () => { selEmb = false; montaFiltros(); }));
+    ec.appendChild(chip("Sim","posição da resposta muda", selEmb, () => { selEmb = true; montaFiltros(); }));
     // quantidade
     const qc = $("fQtd"); qc.innerHTML = "";
     [10,20,30,40,"Todas"].forEach(q => {
@@ -338,6 +367,7 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
     return lista;
   }
 
+  /* embaralhamento Fisher-Yates (todas as posições com a mesma chance) */
   function embaralhar(a){
     const arr = a.slice();
     for (let i = arr.length - 1; i > 0; i--){
@@ -345,6 +375,29 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
       [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
+  }
+
+  /* alternativas do tipo "Todas as anteriores" / "Nenhuma das anteriores"
+     precisam continuar no mesmo lugar, senão a questão perde o sentido */
+  const ANCORA = /^\s*(todas|nenhuma)\b/i;
+
+  function sortearAlternativas(q){
+    const livres = q.alts.map((t,i)=>i).filter(i => !ANCORA.test(q.alts[i]));
+    const novos  = embaralhar(livres);
+    let k = 0;
+    const mapa = q.alts.map((t,i) => ANCORA.test(t) ? i : novos[k++]);
+    return Object.assign({}, q, {
+      alts: mapa.map(i => q.alts[i]),
+      c: mapa.indexOf(q.c)
+    });
+  }
+
+  /* SORTEIO: monta a prova inteira ANTES de a primeira questão aparecer */
+  function sortear(){
+    const pool = embaralhar(filtrar());                 // sorteia o banco todo
+    const n = (selQtd === "Todas") ? pool.length : Math.min(selQtd, pool.length);
+    const prova = embaralhar(pool.slice(0, n));         // sorteia de novo a ordem da prova
+    return selEmb ? prova.map(sortearAlternativas) : prova;
   }
 
   /* ---------- fluxo ---------- */
@@ -446,13 +499,30 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
 
     const feitas = Math.min(idx + 1, fila.length);
     const pct = Math.round(acertosPrimeira / feitas * 100);
+    // critério do DETRAN: 21 acertos em 30 questões (70%)
+    const minimo = Math.ceil(feitas * APROV);
+    const aprovado = acertosPrimeira >= minimo;
+    const faltou = minimo - acertosPrimeira;
+
+    const vd = $("veredito");
+    vd.className = "veredito " + (aprovado ? "ok" : "no");
+    $("vdSelo").textContent = aprovado ? "✅ APROVADO" : "❌ REPROVADO";
+    $("vdNum").textContent = acertosPrimeira + " acertos de " + feitas + " · mínimo para passar: " + minimo;
+    $("vdTxt").textContent = feitas === 30
+      ? (aprovado
+          ? "Na prova oficial do DETRAN são 30 questões e 21 acertos para passar. Você passaria com " + (acertosPrimeira - minimo) + " acerto(s) de folga."
+          : "Na prova oficial do DETRAN são 30 questões e 21 acertos para passar. Faltaram " + faltou + " acerto(s).")
+      : (aprovado
+          ? "Prova de " + feitas + " questões: o mínimo de 70% equivale a " + minimo + " acertos (na prova oficial são 21 de 30)."
+          : "Prova de " + feitas + " questões: faltaram " + faltou + " acerto(s) para os 70% exigidos (na prova oficial são 21 de 30).");
+
     $("scoreNum").innerHTML = pct + "<small>%</small>";
     $("scoreTxt").textContent = acertosPrimeira + " de " + feitas + " questões acertadas na primeira tentativa · " + errosTotais + " erro(s) no total";
 
     let msg, sub;
     if (pct >= 90){ msg = "🏆 Excelente!"; sub = "Nesse ritmo a prova do DETRAN é passeio."; }
-    else if (pct >= 70){ msg = "✅ Aprovado!"; sub = "Acima dos 70% exigidos na prova. Revise os erros e mantenha o ritmo."; }
-    else if (pct >= 50){ msg = "⚠️ Quase lá"; sub = "A prova exige 70% de acerto. Refaça o simulado focando nas matérias que caíram mais."; }
+    else if (aprovado){ msg = "✅ Dentro do exigido"; sub = "Você ficou acima dos 70% de acerto. Revise os erros e mantenha o ritmo."; }
+    else if (pct >= 50){ msg = "⚠️ Quase lá"; sub = "A prova exige 70% de acerto (21 de 30). Refaça o simulado focando nas matérias que mais caíram."; }
     else { msg = "📚 Hora de estudar"; sub = "Releia as explicações com calma e refaça o simulado. Toda questão errada aqui é uma a menos na prova."; }
     $("scoreMsg").textContent = msg;
     $("scoreSub").textContent = sub;
@@ -472,11 +542,7 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   }
 
   /* ---------- eventos ---------- */
-  $("btnIniciar").onclick = () => {
-    const disp = embaralhar(filtrar());
-    const n = (selQtd === "Todas") ? disp.length : Math.min(selQtd, disp.length);
-    iniciar(disp.slice(0, n));
-  };
+  $("btnIniciar").onclick = () => iniciar(sortear());
   $("btnProx").onclick = proxima;
   $("btnSair").onclick = finalizar;
   $("btnRefazer").onclick = () => $("btnIniciar").click();

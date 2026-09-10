@@ -10,13 +10,20 @@ SIMULADO DETRAN - como usar
 
 Como funciona
 -------------
-- As questões são sorteadas a cada rodada (dá para filtrar por caderno,
-  por matéria e escolher quantas questões quer responder).
+- A prova inteira é sorteada ANTES de começar: ao clicar em "Sortear
+  questões e começar", o site embaralha o banco e monta a rodada em ordem
+  aleatória (dá para filtrar por caderno, por matéria e escolher quantas
+  questões quer responder).
+- Opção "Embaralhar as alternativas": muda também a posição da resposta
+  certa (alternativas do tipo "Todas as anteriores" continuam no lugar).
 - Marcou a alternativa errada: ela fica vermelha e o site pede para
   tentar de novo, sem entregar a resposta.
 - Marcou a certa: abre a explicação completa (o porquê da resposta e um
   macete para memorizar).
-- No fim aparece o percentual de acerto de primeira tentativa e a lista
+- No fim aparece o veredito APROVADO ou REPROVADO: o critério é o do
+  DETRAN, 21 acertos em 30 questões (70%). Em rodadas com outra
+  quantidade de questões o mínimo é recalculado pelos mesmos 70%.
+- Também aparece o percentual de acerto de primeira tentativa e a lista
   das questões que você errou, com um botão para treinar só elas.
 
 Conteúdo: 210 questões (cadernos 19, 20, 21, 25, 26, 27 e 28), todas com
