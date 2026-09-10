@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1720">
+<title>Simulado DETRAN</title>
+<style>
+:root{
+  --bg:#0f1720;
+  --bg2:#16212d;
+  --card:#1b2735;
+  --card2:#22303f;
+  --line:#2c3d4f;
+  --txt:#eaf1f8;
+  --txt2:#9fb2c4;
+  --azul:#3d9bff;
+  --verde:#22c55e;
+  --verde-bg:#0f3323;
+  --vermelho:#ef4444;
+  --vermelho-bg:#3a1616;
+  --amarelo:#facc15;
+  --raio:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:16px;line-height:1.5;
+  min-height:100vh;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+h1,h2,h3{margin:0 0 8px;line-height:1.25}
+h1{font-size:26px;letter-spacing:-.4px}
+p{margin:0 0 12px}
+.hidden{display:none !important}
+
+/* ---------- topo ---------- */
+header.top{
+  position:sticky;top:0;z-index:20;
+  background:rgba(15,23,32,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.top-in{max-width:820px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:15px;letter-spacing:.5px;white-space:nowrap}
+.logo span{color:var(--amarelo)}
+.top-stats{margin-left:auto;display:flex;gap:8px;font-size:13px;font-weight:700}
+.pill{padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.pill.ok{color:var(--verde);border-color:#1e4634}
+.pill.err{color:var(--vermelho);border-color:#4a2020}
+.bar{height:4px;background:var(--card);overflow:hidden}
+.bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--azul),var(--verde));transition:width .35s ease}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--raio);padding:18px;margin-bottom:14px}
+.muted{color:var(--txt2);font-size:14px}
+
+/* ---------- formulário inicial ---------- */
+.label{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);font-weight:700;margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1px solid var(--line);background:var(--card2);color:var(--txt);
+  padding:9px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;
+  transition:.15s;
+}
+.chip:hover{border-color:#3f5872}
+.chip.on{background:var(--azul);border-color:var(--azul);color:#04101d}
+.chip small{display:block;font-size:11px;font-weight:600;opacity:.75}
+
+.btn{
+  display:block;width:100%;border:0;border-radius:12px;padding:16px;
+  font-size:17px;font-weight:800;cursor:pointer;transition:.15s;
+  background:var(--azul);color:#04101d;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+.btn.verde{background:var(--verde);color:#04140b}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row .btn{flex:1 1 180px;width:auto}
+
+/* ---------- questão ---------- */
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  padding:4px 9px;border-radius:6px;background:var(--card2);color:var(--txt2);border:1px solid var(--line)}
+.enunciado{font-size:18px;font-weight:600;margin-bottom:16px}
+@media(min-width:640px){.enunciado{font-size:19px}}
+.nota{font-size:13px;color:var(--amarelo);background:rgba(250,204,21,.08);
+  border:1px solid rgba(250,204,21,.28);border-radius:10px;padding:9px 12px;margin-bottom:14px}
+
+.alts{display:flex;flex-direction:column;gap:10px}
+.alt{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+  background:var(--card2);border:1px solid var(--line);color:var(--txt);
+  border-radius:12px;padding:14px;font-size:15.5px;line-height:1.45;
+  cursor:pointer;transition:.15s;font-family:inherit;
+}
+.alt:hover:not(:disabled){border-color:var(--azul);background:#26374a}
+.alt .ltr{
+  flex:0 0 28px;height:28px;border-radius:8px;background:#33475d;color:#dbe8f5;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px
+}
+.alt.errada{background:var(--vermelho-bg);border-color:var(--vermelho);color:#ffc9c9;opacity:.85;cursor:not-allowed}
+.alt.errada .ltr{background:var(--vermelho);color:#fff}
+.alt.certa{background:var(--verde-bg);border-color:var(--verde);color:#c4f5d9}
+.alt.certa .ltr{background:var(--verde);color:#04140b}
+.alt:disabled{cursor:default}
+.shake{animation:shake .4s}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+
+/* aviso de erro */
+.aviso{
+  margin-top:14px;border-radius:12px;padding:14px;
+  background:var(--vermelho-bg);border:1px solid var(--vermelho);color:#ffd4d4;
+  font-weight:600;display:flex;gap:10px;align-items:flex-start;
+  animation:pop .25s ease
+}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.aviso .ic{font-size:20px;line-height:1}
+
+/* ---------- modal acerto ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:50;background:rgba(4,10,16,.72);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+  animation:fade .2s ease
+}
+@media(min-width:640px){.overlay{align-items:center;padding:20px}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--bg2);border:1px solid var(--line);width:100%;max-width:640px;
+  border-radius:18px 18px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  max-height:88vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.3,1)
+}
+@media(min-width:640px){.modal{border-radius:18px;padding-bottom:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.modal h2{color:var(--verde);font-size:23px;display:flex;align-items:center;gap:10px}
+.resposta{
+  background:var(--verde-bg);border:1px solid #1e5c3c;border-radius:12px;
+  padding:12px 14px;margin:14px 0;font-weight:700;color:#c4f5d9
+}
+.bloco{margin-bottom:14px}
+.bloco b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);margin-bottom:5px}
+.macete{background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.28);
+  border-radius:12px;padding:12px 14px;color:#f7e6a8}
+.macete b{color:var(--amarelo)}
+
+/* ---------- resultado ---------- */
+.score{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.score small{font-size:18px;color:var(--txt2);font-weight:700;letter-spacing:0}
+.rev{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.rev-item{padding:10px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.rev-item:last-child{border-bottom:0}
+.rev-item .q{font-weight:600;margin-bottom:4px}
+.rev-item .a{color:var(--verde);font-size:13.5px}
+.dica{font-size:13px;color:var(--txt2);text-align:center;margin-top:6px}
+kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;font-size:12px;font-family:inherit}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="logo">SIMULADO <span>DETRAN</span></div>
+    <div class="top-stats hidden" id="stats">
+      <span class="pill" id="pProg">1/30</span>
+      <span class="pill ok" id="pOk">0</span>
+      <span class="pill err" id="pErr">0</span>
+    </div>
+  </div>
+  <div class="bar"><i id="barra"></i></div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INÍCIO ============ -->
+  <section id="telaInicio">
+    <div class="card">
+      <h1>Simulado de trânsito 🚦</h1>
+      <p class="muted">As questões são sorteadas a cada rodada. Errou? Você tenta de novo até acertar — e só então aparece a explicação completa da resposta.</p>
+      <p class="muted" id="totalBanco"></p>
+    </div>
+
+    <div class="card">
+      <div class="label">Cadernos</div>
+      <div class="chips" id="fCadernos"></div>
+
+      <div class="label">Matérias</div>
+      <div class="chips" id="fTemas"></div>
+
+      <div class="label">Quantas questões</div>
+      <div class="chips" id="fQtd"></div>
+
+      <div style="height:20px"></div>
+      <button class="btn" id="btnIniciar">Começar simulado</button>
+      <div class="dica" id="dicaSel"></div>
+    </div>
+  </section>
+
+  <!-- ============ QUESTÃO ============ -->
+  <section id="telaQuestao" class="hidden">
+    <div class="card">
+      <div class="tags" id="tags"></div>
+      <div class="enunciado" id="enunciado"></div>
+      <div class="nota hidden" id="nota"></div>
+      <div class="alts" id="alts"></div>
+      <div id="avisoBox"></div>
+    </div>
+    <button class="btn sec" id="btnSair">Encerrar e ver resultado</button>
+    <div class="dica">Atalhos: <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> ou <kbd>1</kbd>–<kbd>4</kbd></div>
+  </section>
+
+  <!-- ============ RESULTADO ============ -->
+  <section id="telaFim" class="hidden">
+    <div class="card" style="text-align:center">
+      <div class="score" id="scoreNum"></div>
+      <p class="muted" id="scoreTxt"></p>
+      <h2 id="scoreMsg"></h2>
+      <p class="muted" id="scoreSub"></p>
+    </div>
+    <div class="card hidden" id="cardRev">
+      <h3>Questões que você errou na primeira tentativa</h3>
+      <p class="muted">Vale a pena revisar estas antes da prova:</p>
+      <div class="rev" id="revList"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn verde" id="btnRefazer">Novo sorteio</button>
+      <button class="btn sec" id="btnVoltar">Mudar filtros</button>
+    </div>
+    <div style="height:10px"></div>
+    <button class="btn sec hidden" id="btnSoErros">Treinar só o que errei</button>
+  </section>
+
+</main>
+
+<!-- ============ MODAL ACERTO ============ -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <h2 id="mTitulo">🎉 Você acertou!</h2>
+    <div class="resposta" id="mResposta"></div>
+    <div class="bloco">
+      <b>Por que essa é a correta</b>
+      <div id="mExp"></div>
+    </div>
+    <div class="macete" id="mMacete"></div>
+    <div style="height:18px"></div>
+    <button class="btn verde" id="btnProx">Próxima questão →</button>
+    <div class="dica">Pressione <kbd>Enter</kbd> para continuar</div>
+  </div>
+</div>
+
+<script>
+/* Banco de questões do Simulado DETRAN.
+   Cadernos 19, 20 e 21 (Direção Defensiva): gabarito comentado do material
+   "Direção Defensiva – Gabarito Comentado e Explicado".
+   Cadernos 25 a 28 (Prova Geral): gabarito e comentários elaborados com base
+   no CTB (Código de Trânsito Brasileiro) e no conteúdo programático do DETRAN.
+
+   c = índice da alternativa correta (0=A, 1=B, 2=C, 3=D)
+   nota = observação exibida junto da questão (ex.: questão que dependia de imagem) */
+
+const QUESTOES = [];
+
+function Q(caderno, tema, e, alts, c, exp, mac, nota) {
+  QUESTOES.push({ caderno, tema, e, alts, c, exp, mac, nota });
+}
+
+
+/* Caderno 19 – Direção Defensiva */
+
+Q(19, `Direção Defensiva`,
+`Assinale a alternativa correta. A força centrípeta, aderência e a transferência de massa, são:`,
+[`Condições adversas.`,`Automatismos corretos.`,`Leis da física que se relacionam ao ato de dirigir.`,`Atos inseguros do motorista.`],2,
+`A força centrípeta (que puxa o veículo para o interior das curvas), a aderência (capacidade de atrito do pneu com o solo) e a transferência de massa (deslocamento de peso entre os eixos dianteiro e traseiro) são fenômenos físicos que regem o comportamento de qualquer veículo em movimento. Eles não dependem da vontade do motorista, mas sim das leis da física.`,
+`Pensou em gravidade, forças da natureza e atrito? Pensou em FÍSICA! Não são atitudes do condutor, são forças reais que atuam sobre o carro.`);
+
+Q(19, `Direção Defensiva`,
+`Para evitar colisões nos cruzamentos é fundamental:`,
+[`Respeitar a preferência.`,`Olhar primeiro para a direita e avançar.`,`Aumentar a velocidade.`,`Diminuir a velocidade e buzinar.`],0,
+`Cruzamentos são áreas de alto conflito no trânsito. A regra básica e legal para garantir a segurança e evitar batidas é sempre respeitar o direito de preferência estabelecido pela sinalização ou pelas regras de trânsito (como a preferência de quem vem pela direita).`,
+`No cruzamento, para ter paz e não batida, siga a lei da preferência.`);
+
+Q(19, `Direção Defensiva`,
+`É atitude do condutor defensivo, quando ingerir bebida alcoólica:`,
+[`Dirigir redobrando os cuidados.`,`Dirigir somente se estiver acompanhado.`,`Tomar banho bem frio ou molhar a cabeça para despertar, antes de começar a dirigir.`,`Não dirigir o veículo, pedindo a outro condutor habilitado que realize tal atitude.`],3,
+`O álcool diminui drasticamente os reflexos, altera a percepção de perigo e a coordenação motora. A única conduta 100% segura e em conformidade com a legislação de trânsito é passar a direção para um condutor habilitado que não tenha bebido.`,
+`Se beber, passe a chave! O motorista da rodada deve estar sempre 100% sóbrio.`);
+
+Q(19, `Direção Defensiva`,
+`Sobre acidentes de trânsito podemos afirmar que a maioria deles está associada a:`,
+[`Falhas mecânicas.`,`Deficiência da via.`,`Falta de sinalização.`,`Falhas humanas.`],3,
+`Estatísticas nacionais mostram que mais de 90% dos acidentes de trânsito são decorrentes de falha humana (imprudência, negligência ou imperícia do condutor), superando de longe as falhas mecânicas ou deficiências das vias.`,
+`A maior culpada no trânsito é a "peça" que fica entre o volante e o banco: o ser humano!`);
+
+Q(19, `Direção Defensiva`,
+`Assinale a alternativa INCORRETA. Dirigir na defensiva é:`,
+[`Dirigir atento às ações dos demais usuários.`,`Dirigir impondo os seus direitos.`,`Dirigir com educação e segurança.`,`Dirigir respeitando a legislação.`],1,
+`A direção defensiva foca na prevenção de acidentes e na cortesia. Impor direitos a qualquer custo gera conflitos, agressividade e colisões. O condutor defensivo prefere abrir mão de seu direito (como a preferência na via) para evitar um acidente.`,
+`Atenção ao "INCORRETA": no trânsito defensivo você nunca "impõe" nada, você sempre cede pela segurança!`);
+
+Q(19, `Direção Defensiva`,
+`Tempo de reação é aquele que transcorre entre:`,
+[`O pisar no freio e a imobilização total do veículo.`,`O acionar a embreagem e o freio.`,`Ver o perigo e pisar no freio.`,`Perceber o perigo e parar.`],2,
+`O tempo de reação é o intervalo entre o momento em que o condutor vê um perigo na pista e o momento em que ele reage fisicamente, pisando no pedal do freio. O veículo ainda continua se deslocando com a mesma velocidade nesse período.`,
+`Reação é o "susto": você VÊ o perigo e REAGE (pisa no freio). O veículo ainda não parou!`);
+
+Q(19, `Direção Defensiva`,
+`Valorizar comportamentos relacionados à segurança no trânsito é:`,
+[`Uma demonstração de respeito à pessoa humana.`,`Dever do Estado e não dos condutores.`,`Desnecessário, pois não contribui para a diminuição dos acidentes.`,`Necessário às diferenças individuais.`],0,
+`Adotar comportamentos seguros no trânsito protege a vida, a saúde e a integridade de todos na via. É, essencialmente, uma demonstração de empatia e valorização da vida humana.`,
+`Valorizar a segurança = Valorizar as pessoas. Trânsito seguro é humanidade em primeiro lugar!`);
+
+Q(19, `Direção Defensiva`,
+`Automatismo correto significa:`,
+[`Atenção fixa.`,`Atenção dispersiva.`,`Gesto inconsciente efetuado de forma segura.`,`Indisciplina na condução do veículo.`],2,
+`Automatismos são ações ou gestos que o motorista executa de forma automática e inconsciente devido à prática repetida (como mudar de marcha ou acionar a seta). Se esses gestos forem seguros e corretos, são chamados de automatismos corretos.`,
+`Automatismo = automático (inconsciente). Correto = feito de forma segura. Junte as duas palavras!`);
+
+Q(19, `Direção Defensiva`,
+`Fator que não altera a aderência é:`,
+[`Tipo de solo.`,`Tipo de combustível.`,`Chuva.`,`Calibragem dos pneus.`],1,
+`A aderência é o atrito entre o pneu e o solo. Ela é influenciada pelo estado do pneu, tipo de solo (asfalto, terra), calibragem e presença de água/chuva. O combustível que alimenta o motor não tem nenhuma influência direta na aderência dos pneus com a pista.`,
+`O pneu não quer saber se o carro bebe gasolina, álcool ou eletricidade; ele só quer se agarrar ao chão!`);
+
+Q(19, `Direção Defensiva`,
+`O condutor que, na direção do veículo, evita situações de acidentes ao trafegar com as devidas margens de segurança, está praticando uma direção defensiva:`,
+[`Corretiva.`,`Avaliativa.`,`Participativa.`,`Preventiva.`],3,
+`A direção defensiva preventiva ocorre quando o motorista se antecipa aos riscos, agindo antes que o perigo apareça (dirigindo com atenção, mantendo distância e velocidade segura). A corretiva ocorre quando o motorista precisa agir sob emergência para sanar um perigo imediato.`,
+`Prevenir é melhor que remediar. Agiu antes com margem de segurança? Direção Preventiva!`);
+
+Q(19, `Direção Defensiva`,
+`Assinale a alternativa que responda à questão. A chuva é condição adversa do ______, lâmina d'água na pista é condição adversa da ______, possibilitando a ocorrência de hidroplanagem que pode ser aumentada por determinadas condições adversas do ______.`,
+[`Veículo; via; condutor.`,`Tempo; via; veículo.`,`Condutor; máquina; passageiro.`,`Veículo; chuva; tempo.`],1,
+`A chuva é um fenômeno climático (condição adversa do tempo); a lâmina d'água acumula-se sobre a superfície do asfalto (condição adversa da via); e a hidroplanagem é agravada pelo estado de conservação e calibragem dos pneus (condição adversa do veículo).`,
+`Chuva vem do céu (Tempo). Lâmina de água fica no chão (Via). Pneu careca é problema do carro (Veículo).`);
+
+Q(19, `Direção Defensiva`,
+`O procedimento correto em um declive acentuado é:`,
+[`Utilizar o "ponto morto".`,`Utilizar a mesma marcha que seria necessária no caso de um aclive acentuado.`,`Testar o acelerador e desengrenar o veículo.`,`Desligar o motor do veículo.`],1,
+`Em descidas fortes (declives), deve-se usar o freio-motor engrenando uma marcha forte (normalmente a mesma marcha que seria necessária para subir essa mesma ladeira). Isso poupa os freios de serviço, evitando superaquecimento e perda de frenagem (fading).`,
+`Marcha para subir = Marcha para descer! Use o motor para segurar o veículo.`);
+
+Q(19, `Direção Defensiva`,
+`Chove forte e o limpador de para-brisa de seu veículo não está sendo suficiente para manter a visibilidade. Nessa situação você:`,
+[`Abre as janelas e prossegue o trajeto.`,`Acelera mais para dissipar os pingos de chuva.`,`Para o veículo em local seguro e aguarda.`,`Liga os faróis altos.`],2,
+`Dirigir sem visibilidade adequada é um risco extremo. Se os limpadores não dão conta da intensidade da chuva, a conduta defensiva correta é retirar o veículo da pista (em um local seguro como posto de serviços ou estacionamento) e aguardar até que a chuva diminua.`,
+`Se não dá para ver, não dá para dirigir. Procure um lugar seguro e espere a tempestade passar.`);
+
+Q(19, `Direção Defensiva`,
+`Não é causa da diminuição da aderência do veículo:`,
+[`Óleo na pista.`,`Excesso de velocidade.`,`Pista escorregadia.`,`Pneus em bom estado de conservação.`],3,
+`Pneus novos ou em bom estado de conservação aumentam a aderência e o escoamento de água. Óleo na pista, excesso de velocidade e pista escorregadia são fatores que reduzem a aderência.`,
+`Cuidado com a negação! Pneu bom NÃO diminui a aderência; na verdade, ele aumenta o atrito.`);
+
+Q(19, `Direção Defensiva`,
+`Dirigindo um veículo, ao se aproximar de um cruzamento com sinal luminoso, você observa que a luz amarela está acesa. Neste caso, você deve:`,
+[`Diminuir a velocidade do veículo e passar.`,`Diminuir a velocidade e parar o veículo.`,`Observar o tráfego dos veículos e passar.`,`Frear bruscamente o veículo.`],1,
+`A luz amarela adverte que o semáforo fechará em breve. O motorista deve diminuir a velocidade e parar o veículo com segurança. Só deve passar se já estiver muito próximo do cruzamento e a parada oferecer risco de colisão traseira.`,
+`Sinal amarelo é "Atenção, pare!" e não "Acelere que dá tempo!"`);
+
+Q(19, `Direção Defensiva`,
+`Direção defensiva é o ato de dirigir onde:`,
+[`O condutor se concentra na direção do seu veículo, não se preocupando com as ações dos demais condutores.`,`A utilização do pisca-alerta deve ser utilizada com frequência, nas mais diversas situações.`,`A eliminação dos fatores de riscos pode diminuir a ocorrência de acidentes.`,`A utilização do freio ocorre somente nas paradas de emergência.`],2,
+`A essência da direção defensiva é identificar os perigos do trânsito e eliminar ou neutralizar os riscos de maneira ativa, reduzindo a chance de ocorrência de sinistros.`,
+`Foco na prevenção: Menos riscos = Menos acidentes!`);
+
+Q(19, `Direção Defensiva`,
+`O condutor que dirige com segurança é aquele que:`,
+[`Circula com velocidade adequada às circunstâncias.`,`Ultrapassa outro veículo pela direita.`,`Circula em baixa velocidade em qualquer situação.`,`Circula sempre pela faixa da direita.`],0,
+`Velocidade de segurança é aquela compatível com as circunstâncias do momento (fluxo de pedestres, condições climáticas, estado da via etc.), permitindo que o condutor pare o veículo com total controle em caso de emergência.`,
+`Nem rápido demais, nem devagar demais: ande sempre conforme manda a situação!`);
+
+Q(19, `Direção Defensiva`,
+`Dirigindo um veículo, o condutor que encontrar crianças, pessoas idosas ou portadores de deficiência atravessando a via deve:`,
+[`Diminuir a velocidade, buzinar e seguir em frente.`,`Diminuir a velocidade, desviar e seguir em frente.`,`Parar o veículo e facilitar a travessia.`,`Parar o veículo e ajudá-los a atravessar.`],2,
+`Crianças, idosos e pessoas com deficiência são os pedestres mais vulneráveis e exigem cuidado redobrado. O condutor defensivo deve parar completamente o veículo para permitir que realizem a travessia com segurança.`,
+`Vulnerabilidade total exige parada total do carro. Facilite sempre a travessia deles!`);
+
+Q(19, `Direção Defensiva`,
+`O acidente que envolve apenas um veículo e que não se conhecem suas possíveis causas chama-se:`,
+[`Colisão misteriosa.`,`Colisão em uma passagem de nível (via férrea).`,`Colisão com animais.`,`Atropelamento.`],0,
+`Por convenção da engenharia de tráfego, a "colisão misteriosa" é aquela que envolve um único veículo, ocorre de forma isolada e cujas causas não puderam ser explicadas (ex.: capotamento em pista reta sem testemunhas).`,
+`Só tem um carro envolvido e ninguém sabe o que houve? É um mistério = Colisão misteriosa!`);
+
+Q(19, `Direção Defensiva`,
+`Uma das reações defensivas do condutor, ao perceber a iminência de uma colisão frontal, é:`,
+[`Encostar ao máximo para a direita da pista.`,`Ligar o pisca-alerta.`,`Deslocar-se para o acostamento da esquerda.`,`Aumentar a velocidade.`],0,
+`Diante de um veículo vindo na contramão de direção (perigo de colisão frontal), o condutor deve desviar em direção à direita (acostamento da direita). Nunca desvie para a esquerda, pois o outro motorista instintivamente tentará voltar para a pista dele (que é a sua esquerda).`,
+`Colisão de frente iminente? Jogue sempre para a DIREITA! Nunca para a contramão na esquerda.`);
+
+Q(19, `Direção Defensiva`,
+`Nos dias chuvosos, não é recomendável:`,
+[`Trafegar com o pisca-alerta acionado.`,`Aumentar a distância de segurança para com os veículos que seguem à frente.`,`Acender pelo menos as luzes de posição.`,`Sinalizar com maior abundância suas intenções de manobras.`],0,
+`O pisca-alerta indica veículo parado ou em emergência extrema. Usá-lo com o carro em movimento confunde os condutores de trás, que podem achar que o carro está parado na pista, aumentando o risco de colisões traseiras.`,
+`Pisca-alerta é para carro PARADO. Andar com ele ligado na chuva confunde os outros!`);
+
+Q(19, `Direção Defensiva`,
+`O condutor de um veículo, ao deparar-se com outro agindo de forma incorreta, deve:`,
+[`Fazer valer seu direito.`,`Ceder seu direito para evitar consequências maiores.`,`Ceder a vez e logo à frente castigar o condutor infrator com uma "fechada".`,`Deixar que o acidente aconteça para fazê-lo pagar pelo erro.`],1,
+`A direção defensiva prioriza evitar acidentes. Mesmo que você tenha a razão ou o direito legal de preferência, se outro condutor cometer um erro, ceda a vez para impedir que uma batida aconteça.`,
+`É melhor abrir mão da razão do que do para-choque. Ceda o direito e evite o acidente!`);
+
+Q(19, `Direção Defensiva`,
+`A atitude correta para o condutor defensivo evitar acidente com pedestre é:`,
+[`Ceder o direito de passagem ao pedestre.`,`Buzinar, indicando perigo.`,`Acender os faróis, quando avistar pedestres na pista.`,`Respeitar o pedestre, apenas se o mesmo estiver atravessando na faixa apropriada.`],0,
+`O pedestre é o elemento mais frágil no trânsito. O condutor defensivo sempre coloca a preservação da vida acima de tudo, cedendo a passagem aos pedestres para evitar atropelamentos.`,
+`No trânsito, o maior protege o menor. O pedestre sempre tem a preferência da vida.`);
+
+Q(19, `Direção Defensiva`,
+`São tipos de direção defensiva:`,
+[`Disciplinar e Legal.`,`Preventiva e Corretiva.`,`Eficiente e Utilitária.`,`Segura e Insegura.`],1,
+`A direção defensiva subdivide-se em Preventiva (que se antecipa aos riscos e perigos, sendo a ideal) e Corretiva (que exige ação rápida do condutor para escapar de um perigo imediato já instalado).`,
+`Os dois braços da direção segura: P.C. = Preventiva (antes) e Corretiva (depois).`);
+
+Q(19, `Direção Defensiva`,
+`Quando estiver conduzindo um veículo lembre-se de que você, em outras circunstâncias, é passageiro ou pedestre. Assim, deve-se:`,
+[`Ultrapassar veículos parados em fila, que estejam aguardando a abertura do sinal luminoso.`,`Ultrapassar outro veículo em pontes e viadutos.`,`Dar passagem aos pedestres, apenas quando for passar sobre a calçada para entrar em algum estacionamento.`,`Dar passagem aos pedestres que estiverem nas faixas de segurança, onde não existir sinal luminoso.`],3,
+`Em locais com faixa de segurança mas sem semáforo, a preferência legal e ética de travessia pertence inteiramente ao pedestre. O motorista deve imobilizar o veículo para dar passagem.`,
+`Empatia no trânsito: trate o pedestre na faixa como você gostaria de ser tratado a pé!`);
+
+Q(19, `Direção Defensiva`,
+`Manter uma distância do veículo da frente é uma:`,
+[`Condição segura para que o condutor tenha tempo de reagir e acionar os freios bruscamente, diante de situação de emergência.`,`Conduta desnecessária para a segurança no trânsito.`,`Condição segura para que o condutor tenha tempo de reagir e acionar os freios diante de situação de emergência.`,`Conduta que contraria as normas de direção defensiva.`],2,
+`A distância de seguimento (segurança) garante o espaço físico e o tempo de reação necessários para que o motorista perceba a frenagem do carro da frente e consiga parar sem colidir. Repare que a alternativa A está errada por falar em frear "bruscamente".`,
+`Distância de seguimento = Distância da vida! Te dá tempo para pensar e frear.`);
+
+Q(19, `Direção Defensiva`,
+`Direção Defensiva leva o condutor a:`,
+[`Dirigir indiferentemente quanto aos demais usuários.`,`Dirigir com atenção dispersiva.`,`Dirigir com educação, segurança e eficiência.`,`Dirigir com atenção fixa.`],2,
+`Dirigir defensivamente baseia-se em três pilares integrados: a civilidade e respeito com os outros (educação), a proteção à vida (segurança) e o bom uso dos recursos do carro (eficiência).`,
+`Os três pilares do motorista nota 10: E.S.E. (Educação, Segurança e Eficiência).`);
+
+Q(19, `Direção Defensiva`,
+`Não são técnicas adequadas para a realização de uma ultrapassagem segura:`,
+[`Realizar sinalização e redobrar a atenção.`,`Manter distância de segurança, antes de iniciar a manobra.`,`Planejar o espaço necessário para a manobra completa.`,`Ultrapassar pelo acostamento quando o trânsito estiver muito lento.`],3,
+`O acostamento é destinado exclusivamente a paradas de emergência de veículos e ao trânsito de pedestres ou ciclistas. Ultrapassar pelo acostamento é infração gravíssima e oferece altíssimo risco de colisão e atropelamento.`,
+`Acostamento não é pista! Nunca use o acostamento para andar ou ultrapassar.`);
+
+Q(19, `Direção Defensiva`,
+`É correto afirmar que o condutor defensivo geralmente é:`,
+[`Um motorista profissional.`,`Um motorista corretivo.`,`Um especialista em trânsito.`,`Um bom cidadão.`],3,
+`A direção defensiva é a aplicação prática do respeito mútuo, do cumprimento das leis e do zelo pela vida em sociedade. Por isso, o motorista defensivo reflete o perfil de um bom cidadão.`,
+`Motorista defensivo é, antes de tudo, um cidadão consciente e civilizado.`);
+
+Q(19, `Direção Defensiva`,
+`"Enxergando" o perigo com antecedência, você estará:`,
+[`Prevendo a falta de responsabilidade dos pedestres.`,`Prevendo a falta de responsabilidade dos outros motoristas.`,`Trafegando com margens de segurança.`,`Todas as afirmativas estão corretas.`],3,
+`Olhar à distância (ver o perigo com antecedência) permite prever erros cometidos por pedestres e por outros motoristas desatentos, possibilitando trafegar com ótimas margens de segurança.`,
+`Enxergar longe é prever tudo e todos para se manter seguro.`);
+
+
+/* Caderno 20 – Direção Defensiva */
+
+Q(20, `Direção Defensiva`,
+`O contato dos pneus com o solo é chamado de:`,
+[`Aderência.`,`Derrapagem.`,`Aquaplanagem.`,`Hidroplanagem.`],0,
+`Aderência é o atrito de contato físico gerado entre a borracha dos pneus e a superfície da via. Ela é fundamental para garantir a estabilidade, a frenagem e o controle do veículo.`,
+`Pneu grudado/aderido no asfalto = Aderência.`);
+
+Q(20, `Direção Defensiva`,
+`"Horário de pico" é aquele com tráfego:`,
+[`Disperso e com alta velocidade.`,`Denso e com baixa velocidade.`,`Desenvolvido ao final da madrugada e início do dia.`,`Menor em relação à movimentação de pedestres e veículos.`],1,
+`O horário de pico é caracterizado pelo congestionamento causado pela grande concentração de veículos circulando simultaneamente (tráfego denso), o que resulta em velocidades médias muito baixas.`,
+`Pico = Muita gente junta (denso) e trânsito travado (baixa velocidade).`);
+
+Q(20, `Direção Defensiva`,
+`A atitude prudente para se livrar de veículos "colados" na retaguarda é:`,
+[`Desviar para a esquerda, alertando o outro condutor.`,`Aumentar a velocidade em relação ao outro veículo.`,`Acender o pisca-alerta, fazendo sinal de braço para o outro condutor.`,`Encostar para a direita da pista, reduzindo a velocidade se necessário, dando passagem para o veículo.`],3,
+`Andar com um carro colado na sua traseira é perigoso, pois qualquer frenagem sua causará colisão. O procedimento defensivo é dar passagem a ele pela direita, reduzindo sua velocidade para que ele passe rapidamente e com segurança.`,
+`Se tem alguém colado na sua traseira, não dispute corrida! Dê passagem pela direita.`);
+
+Q(20, `Direção Defensiva`,
+`A cabeça do motociclista, mesmo quando o corpo for inclinado, deverá permanecer sempre na posição:`,
+[`Vertical.`,`Não exige posição correta.`,`Horizontal.`,`Contrária à inclinação do corpo.`],0,
+`Ao fazer curvas, o motociclista inclina a moto e o próprio corpo, mas deve manter a cabeça na vertical (alinhada com o horizonte). Isso garante um campo visual correto e ajuda no equilíbrio.`,
+`A moto deita, o corpo deita, mas a cabeça fica em pé (vertical) para manter a visão do horizonte.`);
+
+Q(20, `Direção Defensiva`,
+`A cegueira momentânea causada pelo excesso de luz provoca:`,
+[`Ofuscamento.`,`Catarata.`,`Penumbra.`,`Nevoeiro.`],0,
+`O ofuscamento é a perda temporária de visão (cegueira momentânea) provocada pela incidência direta de luz forte nos olhos do condutor, seja pelo farol alto de outro veículo ou pela luz solar de frente.`,
+`Luz demais na cara = Ofuscou a visão! (cegueira temporária).`);
+
+Q(20, `Direção Defensiva`,
+`A colisão frontal é considerada a mais perigosa nos ensinamentos de direção defensiva porque:`,
+[`As velocidades se somam e o risco de morte aumenta.`,`Em baixas velocidades, os danos materiais são muito altos.`,`Só acontecem em rodovias federais.`,`Os carros envolvidos, se de grande porte, não protegem os ocupantes.`],0,
+`No choque de frente entre dois veículos, as velocidades de ambos se somam para calcular a força do impacto. Essa desaceleração brutal e instantânea causa ferimentos gravíssimos ou morte.`,
+`Bater de frente é somar as forças. Velocidades se somam = Impacto fatal!`);
+
+Q(20, `Direção Defensiva`,
+`A desaceleração brusca e o uso incorreto dos freios podem provocar o desgarramento da parte traseira do veículo. Este tipo de reação é chamada de comportamento:`,
+[`Sub-esterçante.`,`Inseguro.`,`Sobre-esterçante.`,`Inadequado.`],2,
+`O comportamento sobre-esterçante (oversteer) ocorre quando o veículo perde aderência no eixo traseiro e a traseira desgarra ou desliza para fora da curva. É provocado por frenagem brusca ou aceleração excessiva em curva.`,
+`SOBRE-esterçante = a traseira quer passar por SOBRE a frente (desgarra a traseira). Sub-esterçante = a frente escorrega e vai reto.`);
+
+Q(20, `Direção Defensiva`,
+`A monitoração prática de pilotagem de moto em via urbana ou rural visa ensinar o motociclista sobre os perigos da condução no trânsito. Sobre o motociclista, assinale a alternativa incorreta:`,
+[`Ele deve sinalizar suas intenções por gestos ou luzes.`,`Manter a distância de seguimento evita ser surpreendido por buracos e "bocas-de-lobo".`,`Evite se posicionar no "ponto cego" dos automóveis.`,`O capacete do garupa não precisa de viseira.`],3,
+`O garupa da motocicleta é um usuário exposto aos mesmos riscos que o piloto. O uso de capacete com viseira ou óculos de proteção é obrigatório por lei para o piloto e também para o garupa.`,
+`Garupa também tem olhos! Tudo o que protege o piloto é obrigatório para o carona.`);
+
+Q(20, `Direção Defensiva`,
+`A distância percorrida pelo veículo, logo após o condutor perceber efetivamente o perigo e acionar os freios, é denominada:`,
+[`Distância de reação.`,`Distância de parada.`,`Distância de frenagem.`,`Distância de percepção.`],2,
+`A distância de frenagem é o espaço percorrido pelo veículo a partir do momento em que o motorista efetivamente pisa no pedal de freio até a parada total do veículo. (Distância de parada = distância de reação + distância de frenagem.)`,
+`Começou a frear? O freio está agindo, então é a distância de FRENAGEM!`);
+
+Q(20, `Direção Defensiva`,
+`A finalidade da direção defensiva é a condução:`,
+[`Em alta velocidade.`,`De forma educada e segura.`,`De automatismos incorretos.`,`Sem interferência do autocontrole.`],1,
+`A direção defensiva é um conjunto de atitudes que busca preservar a vida e a integridade de todos no trânsito, conduzindo o veículo de forma cortês (educada) e livre de riscos (segura).`,
+`Defensiva é sinônimo de paz e segurança: condução educada e segura.`);
+
+Q(20, `Direção Defensiva`,
+`A maioria dos acidentes está associada à condição adversa do condutor. A grande maioria deles é causada por:`,
+[`Falhas mecânicas.`,`Deficiência da via.`,`Falta de sinalização.`,`Falhas humanas.`],3,
+`Mais de 90% dos sinistros de trânsito acontecem devido a comportamentos inadequados dos motoristas (imprudência, imperícia ou negligência), caracterizando falhas humanas.`,
+`O ser humano atrás do volante é o principal responsável pelos acidentes no trânsito.`);
+
+Q(20, `Direção Defensiva`,
+`A principal causa da colisão frontal em vias retas é:`,
+[`Retorno à esquerda.`,`Ultrapassagem incorreta.`,`Conversão à direita.`,`Ausência de sinalização.`],1,
+`Em retas, os carros circulam em sentidos opostos nas suas respectivas faixas. Uma colisão frontal em reta ocorre quase sempre quando um veículo tenta ultrapassar o outro invadindo a contramão sem espaço suficiente.`,
+`Bateu de frente na reta? Só pode ser alguém que tentou passar sem espaço.`);
+
+Q(20, `Direção Defensiva`,
+`A prioridade de passagem na via e no cruzamento deverá se dar em velocidade:`,
+[`Normal.`,`Máxima permitida para o local.`,`Reduzida e com os devidos cuidados de segurança.`,`Todas as afirmativas acima estão corretas.`],2,
+`Mesmo que você tenha a preferência legal, ao passar por qualquer cruzamento deve reduzir a velocidade para poder reagir a tempo caso outro motorista ou pedestre cometa uma infração.`,
+`Preferência não é escudo invisível! Reduza e passe com cuidado.`);
+
+Q(20, `Direção Defensiva`,
+`A soma de ações técnicas e atitudes que permitem prever e evitar acidentes, apesar das ações incorretas dos outros condutores, é chamada de:`,
+[`Direção correta.`,`Direção corretiva.`,`Direção defensiva.`,`Direção de alto risco.`],2,
+`A definição clássica de direção defensiva é exatamente esta: dirigir de forma a prever situações de perigo e evitar acidentes, a despeito das falhas alheias e das condições adversas.`,
+`Evitar acidentes mesmo quando os outros erram = Ser um motorista defensivo!`);
+
+Q(20, `Direção Defensiva`,
+`A ultrapassagem de outro veículo em movimento deverá ser feita pela esquerda, observando-se a seguinte regra:`,
+[`Ao ser ultrapassado, o condutor deverá aumentar a velocidade do seu veículo.`,`Após ultrapassar, o condutor deverá buzinar avisando que completou a ultrapassagem.`,`Para ultrapassar, o condutor deverá ligar os faróis altos.`,`Para ultrapassar, o condutor deverá ter certeza de que dispõe de espaço suficiente.`],3,
+`Para realizar uma ultrapassagem segura é obrigatório certificar-se de que a faixa da contramão está livre e de que há espaço e tempo suficientes para realizar a manobra sem colocar ninguém em risco.`,
+`Sem espaço livre na frente, não tente passar! Espere o momento seguro.`);
+
+Q(20, `Direção Defensiva`,
+`A utilização correta do guia da cidade proporciona deslocamentos seguros, economia de tempo e de combustível. Logo, você deve:`,
+[`Guardar o guia em casa.`,`Decorar o nome de todas as vias da cidade.`,`Manter o guia no porta-luvas, utilizando-o de acordo com as instruções nele contidas.`,`Manter o guia no porta-malas, junto com as ferramentas.`],2,
+`O guia de ruas ou GPS deve estar acessível dentro do carro (no porta-luvas) para ser consultado antes de iniciar o trajeto, permitindo planejar a rota e evitar paradas bruscas ou desorientação.`,
+`Guia serve para guiar. Guarde-o onde você possa alcançar: no porta-luvas!`);
+
+Q(20, `Direção Defensiva`,
+`A única maneira de tirar algum proveito de acidente de trânsito é:`,
+[`Fazer ocorrência.`,`Realizar perícia.`,`Receber o seguro obrigatório.`,`Aprender como agir para evitar que ele se repita.`],3,
+`Acidentes geram traumas e prejuízos. O único proveito que se pode tirar deles é analisar as causas para mudar o comportamento e evitar que a mesma situação ocorra no futuro.`,
+`Do erro se faz o aprendizado. Analise o acidente para nunca mais repeti-lo.`);
+
+Q(20, `Direção Defensiva`,
+`A velocidade que permite ao condutor reagir diante de um obstáculo, um pedestre ou outro veículo é:`,
+[`Compatível com as características da via onde está circulando.`,`Máxima permitida para a via onde está circulando.`,`Máxima de 80 km/h, de acordo com a legislação de trânsito.`,`De 30 km/h, em qualquer via.`],0,
+`A velocidade segura é aquela compatível com as características da via (comercial, residencial, rodovia), fluxo de veículos, pedestres e clima, permitindo parar o carro a tempo diante de qualquer imprevisto.`,
+`Velocidade segura é velocidade adaptada ao meio (compatível com a via).`);
+
+Q(20, `Direção Defensiva`,
+`Adequar a velocidade às diferentes características das vias permite ao condutor dirigir numa velocidade segura. Por isso, você deve:`,
+[`Decidir em cada situação qual a velocidade segura, obedecendo o limite estabelecido, observando as suas próprias condições, as de seu veículo e da via.`,`Verificar se outros veículos trafegam em velocidade segura e imprimir maior velocidade no seu.`,`Confiar na sua habilidade de dirigir, pois dirige há anos.`,`Saber que tem um veículo potente e que pode fazer percursos radicais.`],0,
+`O limite máximo de velocidade vale para condições ideais. Sob chuva, neblina ou trânsito intenso, o motorista defensivo deve reduzir a velocidade para manter a segurança, respeitando as condições reais.`,
+`O limite da placa é o teto máximo. A sua segurança é quem dita a velocidade real!`);
+
+Q(20, `Direção Defensiva`,
+`Ao adequar a velocidade às diferentes condições da via, do veículo, meteorológicas e à intensidade do trânsito, o condutor deve:`,
+[`Transitar sempre abaixo da metade da velocidade máxima estabelecida.`,`Verificar se outros veículos trafegam em velocidade segura e imprimir maior velocidade no seu.`,`Redobrar a atenção e aumentar a velocidade.`,`Decidir em cada situação qual a velocidade segura, dentro do limite estabelecido.`],3,
+`A velocidade ideal é situacional. O motorista defensivo avalia as condições do momento e decide qual a velocidade que garante total controle do veículo, sempre respeitando a velocidade máxima permitida.`,
+`Segurança e bom senso: decida a velocidade ideal para cada situação!`);
+
+Q(20, `Direção Defensiva`,
+`Além de uma boa revisão no veículo, há outros cuidados a serem tomados para uma viagem tranquila e segura. Sobre isso, assinale a alternativa INCORRETA:`,
+[`Deve-se ajudar a evitar acidentes facilitando a ultrapassagem.`,`Ficar atento aos sinais dos outros condutores.`,`Dar seta à esquerda para indicar condição segura para ultrapassagem ao veículo de trás.`,`Manter faróis baixos acesos durante o dia nas rodovias.`],2,
+`Sinalizar com a seta à esquerda para "autorizar" o veículo de trás a ultrapassar é uma prática incorreta e perigosa. A seta serve apenas para indicar as intenções de manobra do próprio veículo.`,
+`Seta é para as SUAS manobras, nunca para "dar ordem" aos outros!`);
+
+Q(20, `Direção Defensiva`,
+`Alguns fenômenos naturais reduzem a nossa capacidade visual e podem tornar-se tão extremos que nos impossibilitam ver outros veículos em condições adversas. A que esses fenômenos estão relacionados?`,
+[`Luz.`,`Tempo.`,`Estrada.`,`Trânsito.`],1,
+`Fenômenos meteorológicos e climáticos da natureza (chuva, granizo, fumaça, neblina, ventos fortes) constituem condições adversas de tempo.`,
+`Clima e fenômenos da natureza = Condição adversa de Tempo!`);
+
+Q(20, `Direção Defensiva`,
+`Ao aproximar-se de qualquer tipo de cruzamento, o condutor deve, exceto:`,
+[`Manter a velocidade.`,`Transitar em velocidade reduzida.`,`Transitar em velocidade moderada.`,`Dar passagem a pedestres.`],0,
+`Ao se aproximar de um cruzamento, a regra de ouro da segurança é reduzir a velocidade para estar preparado para parar. Portanto, manter a velocidade é a conduta errada (a exceção buscada pela questão).`,
+`Atenção ao "EXCETO". Manter a velocidade no cruzamento é perigoso: é a resposta!`);
+
+Q(20, `Direção Defensiva`,
+`Ao atravessar uma passagem de nível com uma ferrovia, sem cancela, você deve:`,
+[`Reduzir a velocidade e atravessar a via férrea.`,`Parar o veículo, olhar para ambos os lados e efetuar o cruzamento com segurança.`,`Buzinar antes de atravessar.`,`Acender os faróis do veículo.`],1,
+`Os trens têm prioridade de trânsito devido à enorme massa e à distância necessária para frenagem. Em cruzamentos ferroviários sem cancela, parar completamente, olhar para os dois lados e ouvir é obrigatório e vital.`,
+`Pare, Olhe e Escute! O trem é gigante e não desvia de você.`);
+
+Q(20, `Direção Defensiva`,
+`Ao atravessarmos por locais onde haja fumaça devemos:`,
+[`Diminuir a velocidade.`,`Aumentar a velocidade.`,`Fechar os vidros e ligar os faróis altos.`,`Fechar os vidros, diminuir a velocidade e ligar os faróis baixos.`],3,
+`A fumaça prejudica a visibilidade e a respiração. A conduta correta é fechar os vidros para isolar a cabine, reduzir a velocidade para evitar colisões e ligar o farol baixo para tornar o veículo visível sem ofuscar.`,
+`Fumaça na pista: vidros fechados, devagar e farol baixo!`);
+
+Q(20, `Direção Defensiva`,
+`Ao conduzir o veículo sob chuva de granizo, o condutor deve:`,
+[`Aumentar a velocidade para passar rápido pela chuva.`,`Parar o veículo em local seguro e aguardar o término da chuva.`,`Ligar o pisca-alerta e parar o veículo imediatamente.`,`Parar o veículo debaixo de viaduto para evitar avaria na lataria do veículo.`],1,
+`O granizo pode danificar seriamente a lataria e os vidros do veículo, além de deixar a pista extremamente escorregadia. O correto é buscar abrigo e parar o carro com segurança até que passe (parar embaixo de viaduto obstrui a via e é perigoso).`,
+`Pedra de gelo caindo do céu? Pare o carro em local seguro e espere passar!`);
+
+Q(20, `Direção Defensiva`,
+`Ao passar sobre um ponto de alagamento e perceber que o freio começa a apresentar falhas, o condutor deve:`,
+[`Acelerar utilizando somente uma marcha.`,`Engrenar a primeira marcha para manter o motor acelerado.`,`Manter a velocidade constante até chegar ao destino.`,`Reduzir a velocidade, testar o freio e, se necessário, sinalizar, parar e procurar socorro.`],3,
+`A água dos alagamentos molha os componentes de fricção dos freios, reduzindo a capacidade de frenagem. O motorista deve reduzir a velocidade e aplicar os freios de forma leve e repetida para secá-los pelo calor do atrito.`,
+`Molhou o freio? Vá devagar, pise de leve para secar e, se não voltar, pare com segurança!`);
+
+Q(20, `Direção Defensiva`,
+`Ao dirigir em uma rodovia, ocorre uma situação de ventos laterais fortes. Nessa situação, você:`,
+[`Fecha as janelas do veículo e continua com a mesma velocidade.`,`Abre a janela do veículo e continua com a mesma velocidade.`,`Reduz a marcha do veículo adotando uma velocidade compatível com a situação e abre os vidros.`,`Mantém a velocidade normal.`],2,
+`Ventos laterais desestabilizam o carro. Reduzir a velocidade (com marcha mais forte, para maior controle) e abrir um pouco os vidros diminui o efeito da pressão do vento sobre a lateral do veículo.`,
+`Vento forte de lado? Abra as janelas e reduza a marcha!`);
+
+Q(20, `Direção Defensiva`,
+`Ao notar árvores ou vegetação que possam estar encobrindo a sinalização, o condutor deve:`,
+[`Redobrar a atenção e reduzir a velocidade para identificar restrições de circulação.`,`Efetuar a poda das árvores para identificar a sinalização.`,`Solicitar ao agente de trânsito que efetue a poda das árvores.`,`Redobrar a atenção, reduzir a velocidade e não se preocupar com a sinalização.`],0,
+`Se as placas de trânsito estão cobertas por mato ou árvores, o motorista defensivo deve reduzir a velocidade e focar a atenção para identificar possíveis perigos ou proibições que não estão totalmente visíveis.`,
+`Placa escondida pelo mato? Vá devagar e olhe bem: pode ser um PARE!`);
+
+Q(20, `Direção Defensiva`,
+`Ao cruzar com outro veículo à noite, utilize a luz baixa. Evite a guerra de faróis. Em caso de ofuscamento, desvie sua visão para:`,
+[`Faixa central.`,`A faixa da direita.`,`A faixa da esquerda.`,`O painel do veículo.`],1,
+`Ao se deparar com farol alto vindo em sentido oposto, olhar diretamente para a luz causa cegueira temporária. O condutor deve desviar os olhos para o lado direito da pista, guiando-se pela faixa branca delimitadora do asfalto.`,
+`Farol alto na sua cara? Desvie a visão para a direita e guie-se pela faixa branca!`);
+
+
+/* Caderno 21 – Direção Defensiva */
+
+Q(21, `Direção Defensiva`,
+`Ao perceber falhas na sua atenção, o condutor defensivo deve agir da seguinte forma:`,
+[`Beber água e continuar a viagem.`,`Parar o veículo e procurar descansar.`,`Aumentar a velocidade para chegar rápido.`,`Ultrapassar os outros veículos com atenção.`],1,
+`Dirigir com atenção dispersa ou fadiga é extremamente perigoso. Se perceber que está perdendo a concentração, o motorista defensivo deve estacionar o veículo em local seguro e repousar.`,
+`Cansaço e sono não se discutem: pare o carro e descanse em local seguro!`);
+
+Q(21, `Direção Defensiva`,
+`Aponte a hipótese de ocorrência de travamento de rodas:`,
+[`Quando o atrito do sistema de freios com as rodas é menor que o atrito dos pneus com o solo.`,`Quando um veículo em desaceleração tende a "sair de traseira" em uma curva.`,`Quando o atrito do sistema de freios com as rodas é maior que o atrito dos pneus com o solo.`,`Quando o atrito do sistema de freios com as rodas é igual ao atrito dos pneus com o solo.`],2,
+`O travamento das rodas ocorre quando a força de frenagem aplicada pelo sistema mecânico de freio supera a força de atrito (aderência) disponível entre os pneus e a pista, fazendo o carro arrastar sem girar as rodas.`,
+`Força do freio > Aderência do pneu com o solo = Roda travada e pneu arrastando!`);
+
+Q(21, `Direção Defensiva`,
+`Após aguardar a abertura do semáforo em um cruzamento, você faz a conversão à direita e encontra um pedestre efetuando a travessia da via. Nessa situação você:`,
+[`Aguarda o pedestre concluir a travessia.`,`Buzina para apressar o pedestre.`,`Pisca os faróis para alertar o pedestre que você vai passar.`,`Freia bruscamente para dar um susto no pedestre.`],0,
+`O pedestre que já iniciou a travessia da via tem preferência absoluta de passagem para concluí-la em segurança, mesmo que o sinal tenha ficado verde para os veículos.`,
+`Pedestre que já começou a travessia tem preferência. Aguarde e não buzine!`);
+
+Q(21, `Direção Defensiva`,
+`Aquaplanagem é:`,
+[`Perda de estabilidade do veículo.`,`Derrapagem do veículo em pista seca.`,`Perda da aderência dos pneus em qualquer tipo de situação.`,`Perda da aderência dos pneus devido a uma camada fina de água no solo.`],3,
+`Aquaplanagem (ou hidroplanagem) é o fenômeno no qual o pneu perde o contato físico direto com o asfalto por causa de uma fina película de água que se forma na pista, fazendo o veículo flutuar e perder o controle direcional.`,
+`Aquaplanagem = Água ("aqua") + planar/flutuar sobre a água.`);
+
+Q(21, `Direção Defensiva`,
+`Às imprudências cometidas pelo condutor chamamos de ato:`,
+[`Consciente.`,`Correto.`,`Inseguro.`,`Seguro.`],2,
+`Qualquer comportamento perigoso ou desobediência às regras de trânsito cometida pelo motorista (imprudência, negligência) é classificada tecnicamente como "ato inseguro".`,
+`Atitude errada e imprudente do motorista = Ato inseguro!`);
+
+Q(21, `Direção Defensiva`,
+`As margens de segurança se alteram dependendo das:`,
+[`Condições da via.`,`Ações do condutor.`,`Condições em que os veículos se encontram.`,`Todas as afirmativas acima estão corretas.`],3,
+`As margens de segurança necessárias para evitar acidentes são dinâmicas e dependem das condições da via (molhada, esburacada), das atitudes do condutor (pressa, atenção) e do estado do veículo (pneus, freios).`,
+`A segurança depende do trio: Via, Condutor e Veículo. Todas estão corretas!`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa correta. Frenagem de emergência é:`,
+[`Travamento das rodas.`,`Redução imediata da velocidade do veículo no menor tempo possível.`,`Redução moderada da velocidade do veículo.`,`Arrastamento dos pneus, sem deixar marcas no solo.`],1,
+`A frenagem de emergência consiste em aplicar a força máxima de frenagem de forma controlada para reduzir a velocidade do veículo o mais rápido possível e evitar um acidente iminente.`,
+`Emergência = Reduzir a velocidade IMEDIATAMENTE, no menor tempo possível.`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa incorreta relacionada ao comportamento do condutor preventivo:`,
+[`Procura a melhor posição no banco para alcançar todos os comandos.`,`Regula retrovisores para ter maior visibilidade.`,`Nas manobras, move a cabeça lateralmente para ter a maior visibilidade possível.`,`Ele não se preocupa com o ponto cego do retrovisor.`],3,
+`O condutor preventivo deve estar extremamente atento aos pontos cegos (áreas que os espelhos não cobrem) e mover a cabeça ou ajustar os retrovisores para minimizá-los. Dizer que ele não se preocupa é a afirmação incorreta.`,
+`Ponto cego esconde moto e carro! O motorista preventivo sempre se preocupa com ele.`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa correta:`,
+[`A aquaplanagem é a flutuação de veículos em rios e lagos.`,`Frenagem é o mesmo que travamento das rodas.`,`Ergonomia é a ciência que estuda a relação entre o homem e a máquina.`,`Dirigir na defensiva é dirigir com rapidez.`],2,
+`A ergonomia estuda a adaptação dos comandos, do espaço físico e dos equipamentos (máquina) para que o ser humano opere de forma confortável, segura e eficiente.`,
+`Ergonomia = Conforto e segurança na relação Homem x Máquina.`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa incorreta:`,
+[`Aderência é a capacidade de atrito do pneu com o solo.`,`Derrapagem é o deslocamento do veículo de sua trajetória.`,`Força centrípeta é aquela que puxa o veículo para dentro da curva.`,`Transferência de massa é a movimentação do corpo dentro do veículo.`],3,
+`A transferência de massa é a variação de peso transferida entre os eixos dianteiro e traseiro do veículo devido a acelerações e frenagens. Não se refere ao movimento dos passageiros dentro do carro.`,
+`Transferência de massa = distribuição do peso do CARRO nos eixos, não os passageiros balançando!`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa incorreta:`,
+[`O ato de dirigir é sempre dinâmico, onde as situações modificam-se constantemente.`,`Automatismos são gestos e ações efetuados pelo condutor de forma inconsciente.`,`A força centrípeta tende a jogar o veículo para fora da curva.`,`Automatismos são reflexos adquiridos na prática da direção veicular.`],2,
+`A força que tende a empurrar o veículo para fora da curva é a força centrífuga (fugir do centro). A força centrípeta é aquela que atrai o corpo para o centro da curva.`,
+`CentriFUGA = quer FUGIR da curva (para fora). Centrípeta = puxa para dentro.`);
+
+Q(21, `Direção Defensiva`,
+`Estando o condutor na direção do veículo e este se apresentando com os pneus gastos, freios desregulados, luz deficiente, significa exemplo de condição adversa do:`,
+[`Condutor.`,`Trânsito.`,`Equipamento de segurança.`,`Veículo.`],3,
+`Pneus carecas, freios sem manutenção e lâmpadas queimadas são falhas mecânicas e de conservação do próprio carro, caracterizando condições adversas do veículo.`,
+`Freio, pneu e luz são peças do carro = Condição adversa do Veículo!`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a alternativa incorreta. O que é Direção Defensiva?`,
+[`Fazer valer seu direito, exigindo-o.`,`Realizar uma viagem sem infrações de trânsito.`,`Realizar uma viagem sem faltar com a cortesia devida no trânsito.`,`É uma maneira de encarar a tarefa de dirigir para reduzir a possibilidade de ser envolvido em acidentes.`],0,
+`A direção defensiva ensina a priorizar a segurança e a prevenção. Tentar impor seu direito legal no trânsito (como a preferência na via) a qualquer custo gera conflitos e colisões.`,
+`Impor direitos à força causa acidentes. Prefira a segurança à razão!`);
+
+Q(21, `Direção Defensiva`,
+`Assinale a definição correta de drogas psicoativas:`,
+[`Substâncias que alteram o sistema neuropsicomotor.`,`Bebida com alto teor alcoólico.`,`Substâncias que provocam sonolência.`,`Bebidas alcoólicas misturadas.`],0,
+`Drogas psicoativas são substâncias que agem no sistema nervoso central, alterando os processos mentais, a percepção, o humor, o comportamento e os reflexos motores.`,
+`Psicoativa = altera o psíquico e a coordenação motora (sistema neuropsicomotor).`);
+
+Q(21, `Direção Defensiva`,
+`Com o acúmulo de água na pista pode ocorrer a aquaplanagem se o veículo estiver:`,
+[`Em velocidade muito reduzida.`,`Em velocidade alta e pneus carecas.`,`Com problemas nos freios.`,`Com folga na direção.`],1,
+`A aquaplanagem acontece quando a velocidade excessiva impede a água de ser empurrada pelos pneus e a falta de sulcos (pneu careca) impossibilita o escoamento da água, fazendo o pneu flutuar.`,
+`Alta velocidade + Pneu careca + Água = Aquaplanagem na certa!`);
+
+Q(21, `Direção Defensiva`,
+`Constitui automatismo incorreto:`,
+[`Usar o pedal de freio antes de usar o pedal de embreagem.`,`Observar a sinalização.`,`Dirigir o veículo com o pé apoiado no pedal da embreagem.`,`Engrenar as marchas de acordo com a velocidade.`],2,
+`Manter o pé apoiado continuamente no pedal de embreagem provoca desgaste prematuro do sistema de transmissão e reduz o controle do veículo, caracterizando um vício de condução (automatismo incorreto).`,
+`Pé na embreagem só para mudar de marcha! Deixar o pé lá "descansando" é erro.`);
+
+Q(21, `Direção Defensiva`,
+`Direção defensiva leva o condutor a:`,
+[`Dirigir com educação, segurança e eficiência.`,`Dirigir indiferentemente quanto aos demais usuários.`,`Dirigir com atenção dispersiva.`,`Dirigir com atenção fixa.`],0,
+`Os grandes objetivos e resultados da direção defensiva são uma conduta cortês (educação), livre de acidentes (segurança) e focada no bom rendimento do veículo (eficiência).`,
+`Três pilares da direção segura: E.S.E. (Educação, Segurança e Eficiência).`);
+
+Q(21, `Direção Defensiva`,
+`Com relação às técnicas de prevenção da colisão quando em ultrapassagem, é incorreto:`,
+[`Estar atento às intenções dos condutores.`,`Auxiliar o outro condutor, sinalizando claramente as intenções.`,`Ter cuidados especiais com os pontos cegos dos veículos que conduzimos.`,`Utilizar a faixa à esquerda da pista, sem atingir a contramão direcional, evitando as tentativas de ultrapassagens perigosas realizadas por terceiros.`],3,
+`Tentar obstruir deliberadamente a faixa da esquerda para "bloquear" ultrapassagens de terceiros é uma conduta incorreta, perigosa e que constitui infração de trânsito. O condutor defensivo deve facilitar e permitir a passagem.`,
+`Não seja o xerife do trânsito! Obstruir os outros gera acidentes. Facilite sempre.`);
+
+Q(21, `Direção Defensiva`,
+`Como o condutor deve se comportar nas curvas?`,
+[`Diminuir a velocidade com antecedência, usando o freio e, se necessário, reduzir a marcha antes de entrar na curva e de iniciar o movimento do volante.`,`Acelerar bastante ao iniciar o trajeto.`,`Pisar bruscamente no freio no início da curva.`,`Fazer sempre movimentos bruscos.`],0,
+`A redução de velocidade e de marchas deve ser completada em linha reta, antes de iniciar a curva. Frear bruscamente dentro da curva desloca o peso do carro e diminui drasticamente a estabilidade devido à força centrífuga.`,
+`Prepare o carro na reta (freia e reduz). Na curva, você só acelera de leve!`);
+
+Q(21, `Direção Defensiva`,
+`Complete a frase: Ao transitar com a motocicleta sob chuva, adote postura defensiva, antecipando-se a situações de risco freando bem antes do que seria usual, já que a pista molhada aumenta a ________.`,
+[`Distância de parada.`,`Distância de seguimento.`,`Distância de reação.`,`Todas estão corretas.`],0,
+`A água na pista diminui a aderência dos pneus. Isso significa que a motocicleta necessitará de muito mais espaço físico para parar totalmente a partir do momento em que o perigo é detectado, aumentando a distância de parada.`,
+`Pista molhada escorrega mais = demora mais para parar = Distância de parada maior!`);
+
+Q(21, `Direção Defensiva`,
+`De todos os procedimentos no trânsito, esta é uma manobra a ser evitada, quando possível:`,
+[`Marcha à ré.`,`Conversão.`,`Baliza.`,`Ultrapassagem.`],0,
+`A marcha à ré é uma manobra que reduz severamente a visibilidade do motorista e aumenta muito o risco de atropelamentos e batidas. Deve ser utilizada estritamente para pequenas manobras de estacionamento.`,
+`Manobra perigosa e sem visão: evite ao máximo andar para trás!`);
+
+Q(21, `Direção Defensiva`,
+`Dirigindo por uma via urbana, a uma distância de cerca de 50 metros de um cruzamento, você percebe a luz amarela do semáforo. Nesta situação você deve:`,
+[`Aumentar a velocidade do seu veículo.`,`Manter a atenção, reduzir a marcha do seu veículo e parar.`,`Reduzir a velocidade do seu veículo e completar a travessia do cruzamento.`,`Buzinar e completar a travessia.`],1,
+`A uma distância de 50 metros há espaço de sobra para desacelerar progressivamente e imobilizar o carro antes da faixa de pedestres de forma totalmente segura. Acelerar para "passar correndo" é infração gravíssima.`,
+`50 metros é longe o suficiente. Viu amarelo? Tire o pé, reduza e pare com calma.`);
+
+Q(21, `Direção Defensiva`,
+`Dirigindo um veículo, o condutor que encontrar crianças, pessoas idosas ou deficientes físicos atravessando a via deve:`,
+[`Diminuir a velocidade, buzinar e seguir em frente.`,`Parar o veículo e facilitar a travessia.`,`Diminuir a velocidade, dar um sinal de luz e seguir em frente.`,`Diminuir a velocidade, desviar e seguir em frente.`],1,
+`Esses grupos de pedestres possuem menor mobilidade ou percepção de trânsito e têm prioridade de travessia absoluta. O motorista defensivo deve imobilizar completamente o veículo para garantir sua integridade.`,
+`Viu pedestre vulnerável? Pé no freio, pare o carro e dê a preferência total.`);
+
+Q(21, `Direção Defensiva`,
+`Não constitui fundamento da direção defensiva:`,
+[`Decisão.`,`Interação.`,`Conhecimento.`,`Atenção.`],1,
+`Os 5 fundamentos (pilares) clássicos da Direção Defensiva são: Conhecimento, Atenção, Previsão, Decisão e Habilidade. "Interação" não faz parte desta lista técnica oficial.`,
+`Decore C.A.P.D.H.: Conhecimento, Atenção, Previsão, Decisão e Habilidade. "Interação" está de fora!`);
+
+Q(21, `Direção Defensiva`,
+`Prever o perigo com antecedência significa:`,
+[`Definir o itinerário.`,`Evitar indecisões nos cruzamentos.`,`Definir opções de trajetos.`,`Todas acima.`],3,
+`A previsão defensiva envolve todo o planejamento antecipado da viagem: definir o itinerário, escolher rotas alternativas para fugir de problemas e programar-se para não hesitar nas interseções da via.`,
+`Planejar o trajeto, evitar hesitações e escolher boas rotas é prever tudo. Todas corretas!`);
+
+Q(21, `Direção Defensiva`,
+`É comportamento do motociclista quando precisa reduzir a velocidade para imobilizar a motocicleta em semáforo:`,
+[`Sinalizar fazendo gesto regulamentar do braço.`,`Observar pelo retrovisor se o condutor de trás está fazendo o mesmo.`,`Frear gradativamente.`,`Todas as afirmativas estão corretas.`],3,
+`Parar a moto com segurança exige: sinalizar com gestos ou luzes, verificar pelos retrovisores se os carros de trás estão reduzindo e frear de maneira progressiva (gradativa) para não travar as rodas.`,
+`Sinalize, vigie a traseira e freie de mansinho. As três condutas estão corretas!`);
+
+Q(21, `Direção Defensiva`,
+`É falso afirmar que, para melhor ser notado no trânsito, o condutor deve:`,
+[`Ligar o limpador de para-brisas frequentemente.`,`Acender os faróis ou lanternas externas nos períodos de lusco-fusco.`,`Utilizar o pisca-alerta e o triângulo de segurança quando parado nas margens das vias.`,`Manter o capô do motor aberto e o triângulo de segurança posicionado atrás, quando este apresentar defeito mecânico.`],0,
+`Ligar o limpador de para-brisas não ajuda em nada a tornar o veículo visível para os outros. Para ser visto, o condutor deve ligar faróis, lanternas, pisca-alerta ou usar o triângulo.`,
+`Limpador serve para limpar água e sujeira, não para fazer sinal de fumaça!`);
+
+Q(21, `Direção Defensiva`,
+`Em uma curva, a diminuição brusca da velocidade provoca transferência de massa fazendo com que o eixo dianteiro fique mais:`,
+[`Pesado que o eixo traseiro, tendendo a "desgarrar a traseira".`,`Leve que o eixo traseiro, tendendo a "desgarrar a dianteira".`,`Pesado que o eixo traseiro, tendendo a "desgarrar a dianteira".`,`Leve que o eixo traseiro, tendendo a "desgarrar a traseira".`],0,
+`Frenagens ou desacelerações bruscas deslocam o peso do carro para a frente (eixo dianteiro pesado). Isso deixa a traseira leve (sem aderência). Com a força centrífuga agindo na curva, a traseira leve tende a escorregar para fora (desgarrar).`,
+`Frenagem forte = frente afunda (pesada) e traseira empina (leve). Traseira leve perde aderência!`);
+
+Q(21, `Direção Defensiva`,
+`Em uma via onde existir dificuldade de deslocamentos com rapidez, devido ao engarrafamento no trânsito, o condutor deverá:`,
+[`Mudar de faixa de rolamento.`,`Manter-se calmo.`,`Desligar o veículo.`,`Buzinar sem parar.`],1,
+`Congestionamentos são estressantes, mas buzinar, mudar de faixa excessivamente ou irritar-se não resolvem o trânsito e geram riscos. A atitude defensiva recomendada é manter a calma.`,
+`Trânsito engarrafado? Respire fundo e tenha paciência. Buzinar não abre caminho!`);
+
+Q(21, `Direção Defensiva`,
+`Entre outros efeitos, a ingestão de álcool pode provocar no condutor:`,
+[`Visão difusa e agilidade.`,`Melhor capacidade de raciocínio lógico.`,`Diminuição da capacidade de visualização.`,`Melhora da capacidade de raciocínio.`],2,
+`O álcool afeta o sistema nervoso central, comprometendo a visão periférica (efeito túnel), a acomodação visual e a percepção de profundidade, gerando diminuição da capacidade visual do motorista.`,
+`Álcool embaça a visão e reduz o campo visual. Bebeu = enxerga menos e pior!`);
+
+
+/* Caderno 25 – Prova Geral */
+
+Q(25, `Primeiros Socorros`,
+`Em que situação e como você deve soltar o cinto de segurança de uma vítima que sofreu um acidente?`,
+[`Quando o cinto de segurança dificultar a respiração, soltar sem movimentar o corpo da vítima.`,`Para liberar os movimentos da vítima.`,`Quando estiver muito calor.`,`Em hipótese alguma deve-se retirar o cinto.`],0,
+`A regra de ouro do socorrista leigo é NÃO movimentar a vítima, por causa do risco de lesão na coluna. A única exceção que justifica soltar o cinto é quando ele estiver comprometendo a respiração – e mesmo assim ele deve ser solto sem mexer no corpo da vítima.`,
+`Não mexa na vítima! Só solte o cinto se ele estiver apertando e atrapalhando a respiração.`);
+
+Q(25, `Sinalização`,
+`As marcas que separam fluxos opostos e proíbem ao condutor ultrapassar outro veículo em movimento são:`,
+[`Contínuas e amarelas.`,`Interrompidas ou seccionadas.`,`Contínuas e brancas.`,`Amarelas interrompidas.`],0,
+`Na sinalização horizontal, a cor amarela separa fluxos de sentidos opostos e a linha contínua indica proibição de transpor. Logo, linha amarela contínua = proibido ultrapassar. A branca separa fluxos de mesmo sentido, e a linha seccionada (tracejada) permite a ultrapassagem.`,
+`Amarela = sentidos opostos. Contínua = não pode cruzar. Juntou as duas: proibido ultrapassar!`);
+
+Q(25, `Legislação`,
+`Advertência por escrito e frequência obrigatória em curso de reciclagem são consideradas:`,
+[`Infração de trânsito.`,`Recurso administrativo.`,`Penalidades.`,`Medidas administrativas.`],2,
+`O CTB (art. 256) lista as penalidades: advertência por escrito, multa, suspensão do direito de dirigir, cassação da CNH e frequência obrigatória em curso de reciclagem. Medidas administrativas são outra coisa (retenção, remoção, recolhimento de documento etc.).`,
+`Penalidade é castigo aplicado ao infrator: advertência, multa, suspensão, cassação e reciclagem.`);
+
+Q(25, `Legislação`,
+`Realizar, fiscalizar e controlar o processo de formação, aperfeiçoamento, reciclagem e suspensão de condutores, expedir e cassar Licença de Aprendizagem, Permissão para Dirigir e Carteira Nacional de Habilitação, mediante delegação do órgão federal competente, é de responsabilidade do:`,
+[`DENATRAN.`,`DETRAN.`,`CETRAN.`,`CONTRAN.`],1,
+`Quem habilita o condutor no dia a dia é o órgão executivo de trânsito do Estado: o DETRAN. O CONTRAN é normativo (cria as regras), o DENATRAN/SENATRAN é o órgão máximo executivo da União e o CETRAN é o órgão consultivo e de recurso no Estado.`,
+`Tirar CNH você vai onde? No DETRAN! Ele executa a habilitação por delegação da União.`);
+
+Q(25, `Direção Defensiva`,
+`Assinale a alternativa correta. A força centrípeta, aderência e a transferência de massa, são:`,
+[`Condições adversas.`,`Automatismos corretos.`,`Leis da física que se relacionam ao ato de dirigir.`,`Atos inseguros do motorista.`],2,
+`São fenômenos físicos que atuam sobre qualquer veículo em movimento, independentemente da vontade do motorista: a força centrípeta puxa o carro para dentro da curva, a aderência é o atrito do pneu com o solo e a transferência de massa é o deslocamento de peso entre os eixos.`,
+`Forças da natureza e atrito? Pensou em FÍSICA aplicada ao ato de dirigir!`);
+
+Q(25, `Legislação`,
+`Deixar o condutor de prestar socorro à vítima de acidente de trânsito quando solicitado pela autoridade de trânsito e seus agentes é infração:`,
+[`Gravíssima.`,`Média.`,`Leve.`,`Grave.`],0,
+`O art. 176 do CTB trata das infrações cometidas por envolvidos em acidente com vítima. Deixar de prestar ou providenciar socorro à vítima, quando solicitado pela autoridade e seus agentes, é infração GRAVÍSSIMA, com multa, suspensão do direito de dirigir e recolhimento da CNH.`,
+`Vida em risco = punição máxima. Negar socorro é sempre gravíssima!`);
+
+Q(25, `Legislação`,
+`No acostamento é permitido:`,
+[`Estacionar em qualquer situação.`,`Circular com bicicletas quando houver outro local apropriado.`,`Parar ou estacionar veículo em situação de emergência, desde que devidamente sinalizado.`,`Trafegar com veículos automotores.`],2,
+`O acostamento não é pista de rolamento: nele é proibido trafegar e ultrapassar. Ele serve para paradas de emergência (devidamente sinalizadas com pisca-alerta e triângulo) e para a circulação de pedestres e ciclistas, quando não houver local próprio.`,
+`Acostamento é só para emergência sinalizada – nunca para andar ou ultrapassar.`);
+
+Q(25, `Legislação`,
+`Dirigir com a validade da CNH vencida há mais de 30 dias é infração:`,
+[`Gravíssima.`,`Grave.`,`Média.`,`Leve.`],0,
+`O art. 162, V, do CTB classifica como infração GRAVÍSSIMA dirigir com a CNH ou Permissão vencida há mais de 30 dias, com multa e a medida administrativa de retenção do veículo até a apresentação de condutor habilitado.`,
+`Passou 30 dias do vencimento? A infração salta direto para gravíssima.`);
+
+Q(25, `Direção Defensiva`,
+`O acidente é considerado evitável quando:`,
+[`Ocorre porque o condutor deixou de fazer tudo que poderia ter feito para evitá-lo.`,`O veículo colide, mesmo estando com velocidade reduzida.`,`As condições adversas não interferiram.`,`O condutor fez tudo que era razoavelmente possível fazer.`],0,
+`Acidente evitável é aquele em que o condutor tinha meios de impedir o acontecimento e não os utilizou (não reduziu, não manteve distância, não previu o risco). Se ele fez tudo que era razoavelmente possível, o acidente é classificado como inevitável.`,
+`Deu para evitar e você não evitou? Acidente evitável.`);
+
+Q(25, `Legislação`,
+`Dirigindo um veículo em uma via de trânsito rápido, com várias faixas de trânsito no mesmo sentido, você poderá:`,
+[`Manter seu veículo na faixa da esquerda em velocidade mais reduzida.`,`Fazer um retorno utilizando o acostamento.`,`Entrar em uma rua lateral à esquerda ou à direita, desde que se obedeça às regras de preferência.`,`Ultrapassar outro veículo pela esquerda quando as condições forem favoráveis.`],3,
+`A regra geral do CTB é que a ultrapassagem seja feita pela esquerda, com segurança e sinalização. Na via de trânsito rápido não existem cruzamentos nem acessos laterais em nível, e a faixa da esquerda é destinada aos veículos mais velozes e à ultrapassagem.`,
+`Ultrapassagem é sempre pela esquerda, e só quando as condições permitirem.`);
+
+Q(25, `Meio Ambiente`,
+`A poluição do ar causa problemas de saúde que resultam, principalmente, em:`,
+[`Doenças do aparelho digestivo.`,`Doenças respiratórias.`,`Alterações visuais.`,`Doenças do aparelho locomotor.`],1,
+`Os poluentes lançados pelos escapamentos (monóxido de carbono, material particulado, óxidos de nitrogênio e enxofre) são inalados e atingem diretamente pulmões e vias aéreas, provocando principalmente doenças respiratórias como asma, bronquite e enfisema.`,
+`Poluição do AR entra pelo nariz: o alvo é o aparelho RESPIRATÓRIO.`);
+
+Q(25, `Legislação`,
+`Marque a alternativa correta sobre os documentos de porte obrigatório:`,
+[`CRV, CRLV e PPD.`,`ACC, PPD, CNH, CRLV.`,`Carteira de identidade, CNH e CRV.`,`LADV, PPD, CNH e CRV.`],1,
+`De porte obrigatório são o documento de habilitação (CNH, PPD ou ACC) e o CRLV (Certificado de Registro e Licenciamento do Veículo). O CRV (documento de propriedade, o antigo DUT) fica guardado em casa, pois serve para transferência.`,
+`Leve com você: habilitação + CRLV. O CRV (transferência) fica guardado em casa!`);
+
+Q(25, `Sinalização`,
+`A placa A-17 adverte o condutor do veículo da existência adiante de:`,
+[`Uma pista escorregadia.`,`Um trecho de via perigosa pela irregularidade de sua superfície.`,`Um trecho com lombada.`,`Uma depressão.`],1,
+`A placa A-17 é a "Pista irregular": adverte que adiante há um trecho de via em más condições de conservação (buracos, ondulações, remendos), exigindo redução de velocidade. Pista escorregadia é a A-16 e saliência/lombada é a A-18.`,
+`A-17 = pista irregular: o asfalto está ruim, reduza a velocidade!`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(25, `Direção Defensiva`,
+`Para evitar colisões nos cruzamentos é fundamental:`,
+[`Aumentar a velocidade.`,`Olhar primeiro para a direita e avançar.`,`Respeitar a preferência.`,`Diminuir a velocidade e buzinar.`],2,
+`Cruzamentos são áreas de alto conflito. A regra básica e legal para evitar colisões é respeitar o direito de preferência estabelecido pela sinalização ou pelas regras de circulação, sempre reduzindo a velocidade na aproximação.`,
+`No cruzamento, respeite a preferência – e reduza sempre, mesmo tendo a vez.`);
+
+Q(25, `Mecânica`,
+`Não constitui equipamento obrigatório para as motocicletas:`,
+[`Velocímetro.`,`Iluminação de placa traseira.`,`Extintor de incêndio.`,`Lanterna de freio de cor vermelha.`],2,
+`O extintor de incêndio não é exigido para motocicletas, motonetas e ciclomotores (e atualmente também não é obrigatório para veículos de passeio). Velocímetro, iluminação da placa e lanterna de freio vermelha são obrigatórios.`,
+`Moto não carrega extintor! Os demais itens de luz e velocímetro são obrigatórios.`);
+
+Q(25, `Primeiros Socorros`,
+`Em um acidente com um caminhão que transporta produto químico, você constata que há um grande vazamento. Qual a sua atitude?`,
+[`Se aproxima do veículo e sinaliza o local independente do produto derramado na pista.`,`Joga na pista, sobre o derramamento, serragem, areia ou outro produto similar que você puder dispor no momento, para evitar outros acidentes.`,`Para o seu veículo perto do acidente.`,`Vai embora do local sem prestar nenhuma ajuda.`],1,
+`Nunca se aproxime do veículo nem estacione perto: produtos químicos podem ser tóxicos, corrosivos ou inflamáveis. Deve-se manter distância, acionar o socorro especializado e, se possível e com segurança, cobrir o derramamento com areia ou serragem para evitar que outros veículos derrapem.`,
+`Produto químico vazando: não chegue perto, não pare ao lado – isole, cubra com areia e chame o socorro.`);
+
+Q(25, `Sinalização`,
+`A ordem do Agente da Autoridade de Trânsito, identificada na imagem, significa:`,
+[`Ordem de seguir para os veículos aos quais a luz é dirigida.`,`Ordem de parada para veículos aos quais a luz é dirigida.`,`Ordem de atenção.`,`Ordem de diminuição da velocidade.`],1,
+`Nos gestos noturnos previstos no CTB, a lanterna com luz vermelha ou a luz apontada diretamente para o veículo significa ORDEM DE PARADA para o condutor a quem a luz é dirigida. As ordens do agente prevalecem sobre qualquer outra sinalização.`,
+`Luz apontada na sua direção = PARE. E ordem de agente vale mais que semáforo e placa.`,
+`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+
+Q(25, `Cidadania`,
+`Cidadania é:`,
+[`Conjunto de elementos naturais e da vida em todas as formas.`,`O desenvolvimento desequilibrado do cidadão.`,`Atuação incorreta na condução de veículo automotor.`,`Qualidade ou estado de cidadão.`],3,
+`Cidadania é a qualidade ou o estado de cidadão, ou seja, a condição de quem possui direitos e deveres perante a sociedade e o Estado. No trânsito, ser cidadão é exercer seus direitos respeitando os direitos dos demais.`,
+`Cidadania = ser cidadão: ter direitos e cumprir deveres.`);
+
+Q(25, `Legislação`,
+`Dirigir o veículo usando calçado que não se firme nos pés ou comprometa a utilização dos pedais é infração:`,
+[`Leve.`,`Média.`,`Grave.`,`Gravíssima.`],1,
+`O art. 252 do CTB trata das condutas que atrapalham a condução (dirigir com o braço fora, com uma das mãos, transportando pessoas de forma inadequada, usando calçado inadequado, etc.). Todas elas são infração MÉDIA.`,
+`Chinelo no pé, braço para fora, uma mão só: tudo isso é infração média (art. 252).`);
+
+Q(25, `Mecânica`,
+`A finalidade do carburador é:`,
+[`Bombear o combustível para o motor.`,`Pressionar o ar para a câmara de combustão.`,`Manter a temperatura do ar limpo e aquecido.`,`Misturar o ar com o combustível na proporção recomendada.`],3,
+`O carburador é o componente do sistema de alimentação que faz a dosagem da mistura ar/combustível na proporção correta antes de mandá-la para os cilindros. Nos carros modernos ele foi substituído pela injeção eletrônica.`,
+`Carburador = "liquidificador" do motor: mistura ar com combustível na medida certa.`);
+
+Q(25, `Legislação`,
+`O condutor de veículo que estiver habilitado na categoria "D" poderá dirigir:`,
+[`Veículo motorizado de peso máximo maior que 3.500 kg, apenas.`,`Veículo motorizado para transporte de cargas perigosas, no máximo.`,`Motocicletas.`,`Veículo motorizado para transporte de passageiros e que tenha mais de 8 lugares, sem contar o condutor.`],3,
+`A categoria D habilita a conduzir veículos de transporte de passageiros com mais de 8 lugares além do motorista (ônibus e micro-ônibus). Quem tem D também pode dirigir os veículos das categorias B e C.`,
+`D de "Dez lugares"? Pense em ônibus: mais de 8 passageiros = categoria D.`);
+
+Q(25, `Direção Defensiva`,
+`É atitude do condutor defensivo, quando ingerir bebida alcoólica:`,
+[`Não dirigir o veículo, pedindo a outro condutor habilitado que realize tal atitude.`,`Dirigir somente se estiver acompanhado.`,`Tomar banho bem frio ou molhar a cabeça para despertar, antes de começar a dirigir.`,`Dirigir redobrando os cuidados.`],0,
+`O álcool reduz reflexos, altera a percepção do perigo e compromete a coordenação motora – e nenhum "truque" (banho frio, café) elimina o álcool do sangue. A única conduta segura e legal é entregar a direção a um condutor habilitado e sóbrio.`,
+`Se beber, passe a chave! Não existe truque para dirigir depois de beber.`);
+
+Q(25, `Mecânica`,
+`Constituem alguns equipamentos e sistemas do veículo importantes para evitar situações de perigo que podem levar a acidentes de trânsito:`,
+[`Suspensão e sistema de direção.`,`Iluminação e lanternas indicadoras de direção.`,`Freios e pneus.`,`Todas as alternativas estão corretas.`],3,
+`Todos os sistemas citados são itens de segurança: suspensão e direção mantêm o veículo estável e controlável; iluminação e setas garantem ver e ser visto; freios e pneus são responsáveis por parar o carro. A manutenção de todos eles previne acidentes.`,
+`Freio, pneu, luz, direção e suspensão: todos são itens de segurança. Todas corretas!`);
+
+Q(25, `Meio Ambiente`,
+`O gás clorofluorcarbono (CFC), utilizado como propelente em vários tipos de sprays, chips de computadores e solventes usados pela indústria eletrônica, é um dos poluentes responsáveis pela ocorrência:`,
+[`Do aumento de temperatura.`,`Da redução da camada de ozônio.`,`Da chuva ácida.`,`Do efeito estufa.`],1,
+`O CFC destrói as moléculas de ozônio da estratosfera, provocando o buraco na camada de ozônio e aumentando a incidência de raios ultravioleta na superfície. A chuva ácida vem dos óxidos de enxofre e nitrogênio, e o efeito estufa, principalmente do CO2.`,
+`CFC ataca o Ozônio – lembre da dupla: spray x camada de ozônio.`);
+
+Q(25, `Sinalização`,
+`A placa R-14 regulamenta:`,
+[`Peso bruto total limitado.`,`Largura até o limite indicado na placa.`,`Peso máximo por eixo.`,`Nenhuma das anteriores.`],0,
+`Na série de regulamentação: R-14 é "Peso bruto total máximo permitido", R-15 é altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo.`,
+`R-14 = peso bruto TOTAL do veículo carregado. R-17 é o peso por EIXO.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(25, `Direção Defensiva`,
+`Nas retas, o motorista deve manter suas mãos no volante na posição:`,
+[`"Dez e dez" ou "oito e quinze".`,`"Duas e trinta" ou "nove e quinze".`,`"Nove e quinze" ou "dez e dez".`,`"Dez e trinta" ou "nove e vinte".`],2,
+`As posições recomendadas para as mãos no volante, comparando com os ponteiros de um relógio, são "nove e quinze" (mãos na horizontal) ou "dez e dez" (mãos um pouco acima). Elas dão maior controle e reduzem lesões em caso de acionamento do airbag.`,
+`Volante é relógio: 9h15 ou 10h10. Nunca dirija com uma mão só!`);
+
+Q(25, `Legislação`,
+`Dirigir um veículo ameaçando os pedestres que estejam atravessando a via pública é:`,
+[`Infração gravíssima.`,`Infração grave.`,`Infração média.`,`Infração leve.`],0,
+`O art. 170 do CTB pune com infração GRAVÍSSIMA (multa e suspensão do direito de dirigir) dirigir ameaçando os pedestres que estejam atravessando a via, ou os demais veículos. É colocar vidas em risco deliberadamente.`,
+`Ameaçar pedestre é atentar contra a vida: gravíssima + suspensão.`);
+
+Q(25, `Direção Defensiva`,
+`Nas rodovias, encontrando um trecho sob nevoeiro intenso, com pouca visibilidade, o condutor deve:`,
+[`Acender as luzes de posição do veículo.`,`Orientar-se pela linha divisória da pista.`,`Procurar um local seguro, fora da pista, onde possa aguardar o tempo melhorar.`,`Todas as alternativas estão corretas.`],3,
+`No nevoeiro todas as condutas citadas são corretas e complementares: acender as luzes (baixa/posição) para ser visto, guiar-se pelas faixas da pista e, se a visibilidade ficar crítica, sair da pista em local seguro e esperar melhorar.`,
+`Neblina: acenda as luzes, guie-se pela faixa e, se piorar, saia da pista. Todas corretas!`);
+
+Q(25, `Primeiros Socorros`,
+`Em que situação o socorrista deve usar a pressão digital na artéria?`,
+[`Em pequenos sangramentos.`,`Nas entorses.`,`Nas contusões.`,`Nos grandes sangramentos.`],3,
+`A compressão direta resolve a maioria dos sangramentos. Quando a hemorragia é intensa e não cede com a compressão local, aplica-se a pressão digital sobre a artéria que irriga a região (braquial, femoral), para reduzir o fluxo de sangue. O garrote é o último recurso.`,
+`Sangramento grande que não para? Comprima a artéria com os dedos.`);
+
+Q(25, `Legislação`,
+`O capacete adequado deve conter o selo do:`,
+[`CONTRAN.`,`INMETRO.`,`DENATRAN.`,`CIRETRAN.`],1,
+`O capacete é um equipamento de proteção individual e precisa ser certificado quanto à qualidade e resistência. Essa certificação é feita pelo INMETRO, cujo selo deve estar presente no capacete.`,
+`Qualidade de produto no Brasil quem certifica é o INMETRO.`);
+
+
+/* Caderno 26 – Prova Geral */
+
+Q(26, `Legislação`,
+`Dirigir um veículo com a validade da CNH vencida há mais de 30 dias caracteriza uma infração:`,
+[`Infração gravíssima, com multa e remoção do veículo.`,`Infração grave, com multa e retenção do veículo.`,`Infração gravíssima, com recolhimento da CNH e retenção do veículo.`,`Infração gravíssima com multa somente.`],2,
+`O art. 162, V, do CTB: dirigir com CNH vencida há mais de 30 dias é infração gravíssima, com multa; as medidas administrativas são o recolhimento do documento de habilitação e a retenção do veículo até a apresentação de condutor habilitado.`,
+`CNH vencida +30 dias: gravíssima, recolhe o documento e retém o carro.`);
+
+Q(26, `Direção Defensiva`,
+`Sobre acidentes de trânsito podemos afirmar que a maioria deles está associada a:`,
+[`Falhas mecânicas.`,`Deficiência da via.`,`Falta de sinalização.`,`Falhas humanas.`],3,
+`Mais de 90% dos acidentes de trânsito decorrem de falha humana – imprudência, negligência ou imperícia do condutor – e não de defeitos do veículo ou da via.`,
+`A maior causa de acidentes fica entre o volante e o banco: o ser humano!`);
+
+Q(26, `Primeiros Socorros`,
+`Na impossibilidade da presença do resgate, o socorrista deve observar prioritariamente:`,
+[`Lesões contundentes.`,`Queimaduras de primeiro grau.`,`Hemorragias.`,`Sinalizar o local.`],2,
+`Depois de garantir a segurança do local, a prioridade no atendimento é sempre o que mata mais rápido: parada respiratória e hemorragias. Uma hemorragia intensa pode levar a vítima à morte em poucos minutos, então deve ser contida imediatamente.`,
+`Prioridade é o que mata rápido: respiração e sangramento (hemorragia).`);
+
+Q(26, `Cidadania`,
+`Agir com cortesia e solidariedade no trânsito significa:`,
+[`Fazer novos amigos.`,`Respeitar os direitos dos outros usuários das vias e ser tolerante.`,`Dar passagem aos outros condutores, ainda que o sinal esteja aberto para você.`,`Sair do veículo e ajudar os pedestres a atravessar a rua.`],1,
+`Cortesia e solidariedade no trânsito significam reconhecer que a via é um espaço coletivo: respeitar o direito dos demais usuários e ser tolerante com as falhas alheias. Abrir mão da preferência de forma imprevisível (alternativa C) pode até causar acidentes.`,
+`Cortesia = respeitar o direito do outro e ter paciência, não bagunçar a ordem do trânsito.`);
+
+Q(26, `Legislação`,
+`Marque a alternativa errada para veículos de transporte de escolares:`,
+[`Registro como veículo de passageiros.`,`Uma faixa escrita: "Transporte de Passageiros".`,`Inspeção semestral (vistoria).`,`Uso obrigatório de tacógrafo.`],1,
+`O art. 136 do CTB exige uma faixa horizontal amarela com os dizeres "ESCOLAR" na cor preta – e não "Transporte de Passageiros". Os demais itens (registro como veículo de passageiros, vistoria semestral e tacógrafo) são exigências corretas.`,
+`Na faixa amarela do transporte escolar está escrito ESCOLAR. Só isso!`);
+
+Q(26, `Mecânica`,
+`A função básica do sistema de suspensão nos veículos automotores é:`,
+[`Absorver os balanços do veículo, somente quando está fazendo uma curva.`,`Melhorar o controle do carro em pistas escorregadias.`,`Absorver os choques provocados pelo piso irregular com o veículo em movimento.`,`Absorver impactos no momento de um acidente.`],2,
+`A suspensão (molas, amortecedores, braços) liga as rodas à carroceria e tem a função de absorver as irregularidades do piso, mantendo os pneus em contato constante com o solo, o que garante conforto, estabilidade e segurança.`,
+`Suspensão amortece os buracos e mantém o pneu colado no chão.`);
+
+Q(26, `Direção Defensiva`,
+`Assinale a alternativa INCORRETA. Dirigir na defensiva é:`,
+[`Dirigir atento às ações dos demais usuários.`,`Dirigir impondo os seus direitos.`,`Dirigir com educação e segurança.`,`Dirigir respeitando a legislação.`],1,
+`Dirigir defensivamente é prevenir acidentes, e não impor direitos. Quem faz questão de "ter razão" no trânsito acaba se envolvendo em conflitos e colisões; o condutor defensivo cede para evitar o acidente.`,
+`Atenção ao INCORRETA: o defensivo nunca impõe, ele cede pela segurança.`);
+
+Q(26, `Legislação`,
+`Por interrupção de marcha entende-se:`,
+[`A parada do veículo durante o tempo necessário para embarque/desembarque de passageiros.`,`A imobilização do veículo para atender circunstância momentânea do trânsito.`,`A imobilização por problemas mecânicos.`,`Manter o veículo no mesmo lugar por tempo superior ao necessário para embarque/desembarque de pessoas.`],1,
+`Interrupção de marcha é a imobilização momentânea imposta pelo próprio trânsito (semáforo fechado, congestionamento, passagem de pedestres). A alternativa A descreve PARADA e a alternativa D descreve ESTACIONAMENTO.`,
+`Trânsito mandou parar (sinal, fila)? Interrupção de marcha. Embarque/desembarque? Parada. Ficou além disso? Estacionamento.`);
+
+Q(26, `Sinalização`,
+`As indicações que prevalecem sobre as demais são:`,
+[`As pinturas viárias.`,`Os sinais luminosos.`,`As placas de trânsito.`,`As ordens dos agentes de trânsito.`],3,
+`A ordem de prevalência do CTB (art. 89) é: 1º as ordens do agente de trânsito; 2º as indicações do semáforo; 3º as indicações das placas; 4º as demais normas e marcações no pavimento.`,
+`Agente > Semáforo > Placa > Pintura no chão. O ser humano manda mais!`);
+
+Q(26, `Sinalização`,
+`A sinalização horizontal se apresenta nas seguintes cores:`,
+[`Amarela, vermelha, branca, azul e preta.`,`Apenas amarela e branca.`,`Apenas amarela, vermelha e branca.`,`Amarela, vermelha, branca, verde e preta.`],0,
+`As cores da sinalização horizontal são: amarela (fluxos opostos), branca (mesmo sentido e faixas de pedestres), vermelha (ciclovias e símbolos de hospital), azul (símbolo de vaga para pessoa com deficiência) e preta (contraste com o pavimento claro).`,
+`Decore: amarela, branca, vermelha, azul e preta – a verde não entra!`);
+
+Q(26, `Legislação`,
+`Dirigir veículo com Carteira Nacional de Habilitação ou Permissão para Dirigir de categoria diferente da do veículo que esteja conduzindo é infração ________ tendo como medida administrativa ________.`,
+[`Grave; retenção do veículo.`,`Grave; recolhimento do documento de habilitação.`,`Gravíssima (x2); retenção do veículo.`,`Gravíssima; recolhimento do documento da habilitação.`],2,
+`Art. 162, III do CTB: dirigir com habilitação de categoria diferente é infração gravíssima, com multa multiplicada por dois, tendo como medida administrativa a retenção do veículo até a apresentação de condutor habilitado.`,
+`Categoria errada = gravíssima com multa dobrada e o carro fica retido.`);
+
+Q(26, `Sinalização`,
+`A placa A-33b adverte o condutor do veículo da existência adiante de:`,
+[`Uma passagem sinalizada de escolares.`,`Travessia de animais.`,`Proibido passagem de pedestres.`,`Passagem obrigatória para veículos escolares.`],0,
+`Na série de advertência, A-33a é "Passagem sinalizada de pedestres" e A-33b é "Passagem sinalizada de escolares", alertando para a travessia de crianças (normalmente perto de escolas). Placa de advertência nunca proíbe nem obriga: apenas adverte.`,
+`A-33b: crianças atravessando adiante – reduza e redobre a atenção.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(26, `Direção Defensiva`,
+`Tempo de reação é aquele que transcorre entre:`,
+[`O pisar no freio e a imobilização total do veículo.`,`O acionar a embreagem e o freio.`,`Ver o perigo e pisar no freio.`,`Perceber o perigo e parar.`],2,
+`Tempo de reação é o intervalo entre ver o perigo e efetivamente pisar no freio. Durante esse tempo o veículo continua andando na mesma velocidade – e a distância percorrida nele é a distância de reação.`,
+`Reação é o susto: você VÊ e REAGE. O carro ainda não começou a frear!`);
+
+Q(26, `Legislação`,
+`A qual veículo pertence a preferência?`,
+[`Ao veículo que vier pela esquerda.`,`Ao veículo que seguir em frente.`,`Ao veículo 1, que está à direita do 2.`,`Ao veículo 2, porque o veículo 1 vai virar à esquerda.`],2,
+`Em cruzamento não sinalizado, a regra do CTB (art. 29, III) dá a preferência a quem vem pela DIREITA. Só existem duas exceções: rotatória (preferência de quem já está circulando) e via preferencial sinalizada.`,
+`Cruzamento sem sinalização: a preferência é de quem vem pela DIREITA.`,
+`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+
+Q(26, `Meio Ambiente`,
+`Marque a alternativa incorreta. A emissão de gases poluentes:`,
+[`Prejudica os reflexos.`,`Não agrava doenças cardiovasculares.`,`Diminui a capacidade de trabalho.`,`Degrada a qualidade de vida.`],1,
+`A afirmação incorreta é a B: os gases poluentes AGRAVAM sim as doenças cardiovasculares, além das respiratórias. O monóxido de carbono, por exemplo, ocupa o lugar do oxigênio no sangue, sobrecarregando o coração.`,
+`Cuidado com o "não" da alternativa: poluição piora coração e pulmão.`);
+
+Q(26, `Legislação`,
+`O candidato encontrado dirigindo sem a companhia do instrutor terá a Licença de Aprendizagem (LADV):`,
+[`Suspensa por 6 meses.`,`Cassada por 24 meses.`,`Apreendida por 6 meses.`,`Recolhida e perderá todo o processo de habilitação, tendo que reiniciar.`],3,
+`A LADV só é válida com o instrutor ao lado e no veículo de autoescola. O candidato flagrado dirigindo sozinho tem a licença recolhida e perde todo o processo de habilitação, tendo que reiniciar do zero – além de responder por dirigir sem habilitação.`,
+`Aprendiz sozinho ao volante: perde tudo e recomeça o processo.`);
+
+Q(26, `Primeiros Socorros`,
+`Na presença de sangramento abundante, qual o cuidado indicado?`,
+[`Garrotear (usar garrote).`,`Fazer compressão no local do sangramento.`,`Dar bastante líquido para a pessoa ir tomando.`,`Jogar bastante água oxigenada para coagular e limpar o ferimento.`],1,
+`A primeira medida diante de um sangramento abundante é a compressão direta sobre o ferimento com pano limpo, elevando o membro se possível. O garrote é o último recurso, pois pode causar necrose e perda do membro.`,
+`Sangrou muito? Comprima com pano limpo. Garrote é o último recurso!`);
+
+Q(26, `Legislação`,
+`É infração gravíssima para o condutor de motocicleta, motoneta ou ciclomotor:`,
+[`Transportar criança menor de sete anos ou que não tenha condições de cuidar de sua própria segurança.`,`Conduzir sem segurar o guidom com ambas as mãos, salvo eventualmente para indicação de manobras.`,`Conduzir transportando carga incompatível com suas especificações.`,`Conduzir rebocando outro veículo.`],0,
+`O art. 244, V, do CTB classifica como GRAVÍSSIMA (com multa, suspensão do direito de dirigir, recolhimento da CNH e retenção do veículo) transportar criança menor de sete anos ou sem condições de cuidar da própria segurança na moto.`,
+`Criança menor de 7 anos na garupa é gravíssima – nem pode andar de moto.`);
+
+Q(26, `Mecânica`,
+`Constituem equipamentos de uso obrigatório, exceto:`,
+[`Espelhos retrovisores.`,`Macaco.`,`Ar condicionado.`,`Chave de roda.`],2,
+`O ar condicionado é item de conforto, não de segurança. Retrovisores, macaco e chave de roda constam entre os equipamentos obrigatórios definidos pelo CONTRAN.`,
+`Ar condicionado é luxo, não obrigação. O resto é segurança!`);
+
+Q(26, `Legislação`,
+`É penalidade que a autoridade de trânsito pode transformar em advertência por escrito, não sendo reincidente o infrator na mesma infração nos últimos 12 meses:`,
+[`Curso de reciclagem.`,`Multa, desde que seja de natureza leve ou média.`,`Suspensão do direito de dirigir.`,`Multa, sendo a infração grave ou gravíssima.`],1,
+`O art. 267 do CTB permite substituir a multa por advertência por escrito nas infrações de natureza LEVE ou MÉDIA, quando o infrator não for reincidente na mesma infração nos últimos 12 meses.`,
+`Só dá para trocar multa por advertência nas infrações leve e média, e se não for reincidente.`);
+
+Q(26, `Sinalização`,
+`A placa R-4b regulamenta:`,
+[`Proibido virar à esquerda.`,`Proibido seguir em frente.`,`Curva acentuada à direita.`,`Proibido virar à direita.`],3,
+`Na série de regulamentação, R-4a é "Proibido virar à esquerda" e R-4b é "Proibido virar à direita". Placas de regulamentação são circulares, com fundo branco, borda e tarja vermelhas.`,
+`R-4a = esquerda proibida; R-4b = direita proibida (a "b" vem depois, igual a direita).`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(26, `Direção Defensiva`,
+`Não constitui fundamento da direção defensiva:`,
+[`Decisão.`,`Interação.`,`Conhecimento.`,`Atenção.`],1,
+`Os cinco fundamentos da direção defensiva são: Conhecimento, Atenção, Previsão, Decisão e Habilidade. "Interação" não faz parte dessa lista.`,
+`Decore C.A.P.D.H. – Interação está de fora!`);
+
+Q(26, `Legislação`,
+`O condutor de veículo que estiver habilitado na categoria "C" poderá dirigir:`,
+[`Combinação de veículos motorizados para transporte de carga perigosa.`,`Veículo motorizado de 2 rodas.`,`Veículo motorizado para transporte de carga cujo peso máximo autorizado esteja acima de 3.500 kg.`,`Veículo motorizado para transporte de carga de peso máximo de até 1.500 kg, apenas.`],2,
+`A categoria C habilita a dirigir veículos de carga com peso bruto total acima de 3.500 kg (caminhões). Combinação de veículos (carreta) é categoria E; veículo de 2 rodas é categoria A.`,
+`C de Carga pesada: caminhão acima de 3.500 kg.`);
+
+Q(26, `Direção Defensiva`,
+`Fazem parte da direção defensiva os seguintes elementos básicos, exceto:`,
+[`Estar sempre alerta e consciente ao que se passa em torno do veículo.`,`Agir de forma sensata e com rapidez nas situações críticas.`,`Possuir alguma prática de direção, somente o suficiente para movimentar o veículo.`,`Ter conhecimento da legislação vigente e das técnicas de prevenção.`],2,
+`A habilidade é um dos fundamentos da direção defensiva e exige prática real de condução. Saber apenas "movimentar o veículo" é insuficiente e perigoso – por isso essa é a exceção pedida pela questão.`,
+`Habilidade de verdade, não só saber sair do lugar. Essa é a exceção!`);
+
+Q(26, `Mecânica`,
+`Não faz parte das partes fixas do motor:`,
+[`Bloco do motor.`,`Cilindros.`,`Cabeçote.`,`Biela.`],3,
+`Bloco, cilindros e cabeçote são as partes fixas (estruturais) do motor. A biela é peça móvel: ela liga o pistão ao virabrequim e transforma o movimento alternativo em rotativo.`,
+`Biela se mexe o tempo todo – logo, é parte móvel!`);
+
+Q(26, `Legislação`,
+`O condutor de veículo só poderá fazer uso da buzina, desde que em toque breve, na seguinte situação:`,
+[`Fora das áreas urbanas, quando for conveniente advertir a um condutor que se tem o propósito de ultrapassá-lo.`,`Em qualquer situação.`,`Fora das áreas urbanas somente quando avistar animal na pista.`,`Ao trafegar perto de hospitais e escolas.`],0,
+`O art. 41 do CTB permite o uso da buzina apenas em toque breve, para advertir sobre risco iminente de acidente ou, fora das áreas urbanas, para indicar a intenção de ultrapassar outro veículo.`,
+`Buzina: toque breve, só para avisar perigo ou ultrapassagem fora da cidade.`);
+
+Q(26, `Cidadania`,
+`Para melhorar o convívio e a qualidade de vida, existem alguns princípios que devem ser a base das nossas relações no trânsito. Indique abaixo qual princípio pode melhorar a nossa convivência no trânsito.`,
+[`Corresponsabilidade pela vida social: valorizar comportamentos necessários à segurança no trânsito e à efetivação do direito de mobilidade a todos os cidadãos.`,`Dignidade da pessoa humana: princípio que não valoriza os direitos humanos e as atitudes fundamentais.`,`Igualdade de direitos: visa garantir a igualdade e não se preocupa com a solidariedade.`,`Participação: mobilização das pessoas onde os problemas de trânsito não são de fundamental importância.`],0,
+`Só a alternativa A define corretamente o princípio: a corresponsabilidade pela vida social significa que todos são responsáveis pela segurança e pela mobilidade de todos. As outras três trazem definições deturpadas dos princípios que citam.`,
+`Trânsito seguro é responsabilidade de TODOS – essa é a corresponsabilidade pela vida social.`);
+
+Q(26, `Primeiros Socorros`,
+`Ao se deparar com um acidente num local onde o socorro seja prestado somente pelo Corpo de Bombeiros, você deverá ligar para o número:`,
+[`191.`,`193.`,`190.`,`181.`],1,
+`193 é o telefone do Corpo de Bombeiros. 190 é a Polícia Militar, 192 o SAMU, 191 a Polícia Rodoviária Federal e 181 o disque-denúncia.`,
+`Bombeiros = 193. Polícia = 190. SAMU = 192. PRF = 191.`);
+
+Q(26, `Legislação`,
+`Nas alternativas abaixo, podemos classificar como imprudência e negligência, respectivamente:`,
+[`Falhas mecânicas previsíveis e alta velocidade.`,`Falhas mecânicas previsíveis e dirigir com sono.`,`Alta velocidade e desobediência à sinalização.`,`Alta velocidade e falhas mecânicas previsíveis.`],3,
+`Imprudência é agir com precipitação, fazer o que não devia (correr demais). Negligência é deixar de fazer o que devia, por descuido (não revisar o carro e deixar acontecer uma falha previsível). Imperícia é falta de técnica.`,
+`Imprudência FAZ demais; negligência DEIXA de fazer; imperícia não SABE fazer.`);
+
+Q(26, `Legislação`,
+`É proibido a todo condutor de veículo:`,
+[`Parar o veículo no acostamento das estradas, quando não houver local apropriado para fazer o retorno.`,`Dar passagem pela esquerda, quando solicitado.`,`Aproximar o veículo do meio-fio para embarque de passageiros.`,`Forçar a passagem entre veículos que, transitando em sentidos opostos, estejam próximos de passar um pelo outro.`],3,
+`O art. 34 e seguintes do CTB proíbem manobras que criem conflito, como se espremer entre dois veículos que vêm em sentidos opostos e estão prestes a se cruzar. É uma das situações clássicas de colisão frontal.`,
+`Nunca se enfie entre dois carros que estão prestes a se cruzar!`);
+
+
+/* Caderno 27 – Prova Geral */
+
+Q(27, `Cidadania`,
+`Valorizar comportamentos relacionados à segurança no trânsito é:`,
+[`Desnecessário, pois não contribui para a diminuição dos acidentes.`,`Dever do Estado e não dos condutores.`,`Uma demonstração de respeito à pessoa humana.`,`Necessário às diferenças individuais.`],2,
+`Comportamentos seguros protegem a vida e a integridade de todos que usam a via. Valorizá-los é, essencialmente, uma demonstração de respeito à pessoa humana – e é dever de todos, não só do Estado.`,
+`Valorizar a segurança = valorizar as pessoas.`);
+
+Q(27, `Legislação`,
+`É proibido o uso de buzina no perímetro urbano no horário compreendido entre:`,
+[`22 horas e 6 horas.`,`20 horas e 7 horas.`,`18 horas e 6 horas.`,`6 horas e 22 horas.`],0,
+`O CTB proíbe o uso da buzina entre as 22h e as 6h nas áreas urbanas, por causa do sossego público. Fora desse horário, ela só pode ser usada em toque breve para advertir de perigo iminente.`,
+`Horário de silêncio: das 22h às 6h nada de buzina na cidade.`);
+
+Q(27, `Sinalização`,
+`A placa SAU-18 indica a presença de:`,
+[`Uma área de estacionamento privado.`,`Uma praça de pedágio.`,`Um Drive Thru.`,`Um posto para abastecer seu veículo à distância indicada na placa.`],1,
+`As placas SAU (Serviços Auxiliares) informam serviços úteis ao usuário da via – hospital, posto de combustível, telefone, restaurante, pedágio, etc. A SAU-18 é a que indica a praça de pedágio adiante.`,
+`SAU = Serviço Auxiliar: o que existe de útil na via (posto, hospital, pedágio...).`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Se a imagem do seu caderno mostrar uma bomba de combustível, a resposta correta é a alternativa D.`);
+
+Q(27, `Primeiros Socorros`,
+`Não constitui procedimento correto com uma vítima em estado de choque:`,
+[`Dar bastante líquido à vítima inconsciente que vomitou.`,`Manter a vítima deitada com as pernas elevadas, se não houver fratura dos membros.`,`Afrouxar suas roupas.`,`Manter a respiração – se necessário usar respiração de socorro.`],0,
+`Jamais se oferece líquido ou alimento a uma vítima inconsciente: ela não consegue engolir e o líquido vai para os pulmões (broncoaspiração), podendo matá-la. As outras três condutas são corretas no estado de choque.`,
+`Vítima inconsciente NÃO bebe nada. Nem água!`);
+
+Q(27, `Meio Ambiente`,
+`Além do óleo diesel, a gasolina e o álcool são amplamente utilizados como fonte de energia para locomoção dos veículos automotores. Os veículos a álcool poluem menos, pois expelem metade de ________ se comparados com os veículos movidos a gasolina.`,
+[`Monóxido de carbono.`,`Hidrocarbonetos.`,`Dióxido de enxofre.`,`Dióxido de carbono.`],0,
+`O etanol tem oxigênio na própria molécula, o que torna a queima mais completa e reduz aproximadamente à metade a emissão de monóxido de carbono (CO), gás tóxico e altamente prejudicial à saúde.`,
+`Álcool queima melhor: solta metade do monóxido de carbono da gasolina.`);
+
+Q(27, `Legislação`,
+`Ao transferir a propriedade, mudar de município ou for alterada qualquer uma das características do veículo será obrigatória a expedição:`,
+[`De novo CLV.`,`De novo CRLV.`,`De novo CRV.`,`De novos CRLV e CRV.`],2,
+`O art. 123 do CTB determina a expedição de novo Certificado de Registro de Veículo (CRV) quando houver transferência de propriedade, mudança de município de domicílio, alteração de característica do veículo ou mudança de categoria.`,
+`Mudou dono, cidade, característica ou categoria: novo CRV (o documento de propriedade).`);
+
+Q(27, `Direção Defensiva`,
+`Assinale a alternativa que responda à questão. A chuva é condição adversa do ______, lâmina d'água na pista é condição adversa da ______, possibilitando a ocorrência de hidroplanagem que pode ser aumentada por determinadas condições adversas do ______.`,
+[`Veículo; via; condutor.`,`Tempo; via; veículo.`,`Condutor; máquina; passageiro.`,`Veículo; chuva; tempo.`],1,
+`A chuva é fenômeno climático (condição adversa de tempo); a lâmina d'água fica sobre o asfalto (condição adversa da via); e a hidroplanagem é agravada por pneus carecas ou descalibrados (condição adversa do veículo).`,
+`Chuva vem do céu (Tempo). Água no chão (Via). Pneu careca (Veículo).`);
+
+Q(27, `Mecânica`,
+`A função do sistema de freios montados nos veículos é:`,
+[`Provocar a moderação da marcha, a redução de velocidade e a imobilização do veículo.`,`Distribuir de forma homogênea a rotação do motor para as rodas.`,`Aumentar o atrito entre as rodas, travando-as, ao ser acionado.`,`Parar e acelerar o veículo.`],0,
+`O sistema de freios serve para moderar a marcha (segurar a velocidade), reduzir a velocidade e imobilizar o veículo. Travar as rodas não é função do freio – é justamente o que se deve evitar, pois faz perder o controle direcional.`,
+`Freio serve para moderar, reduzir e parar – nunca para travar a roda.`);
+
+Q(27, `Primeiros Socorros`,
+`Qual é a posição adequada para posicionar uma criança de 0 a 1 ano?`,
+[`No meio do banco traseiro.`,`No assoalho atrás do banco do motorista.`,`De forma que o rosto da criança fique voltado para o vidro traseiro.`,`Desde que se dirija devagar, preso no cinto de segurança do banco do carona.`],0,
+`O local mais seguro do veículo é o meio do banco traseiro, pois fica mais distante de qualquer ponto de impacto. Bebês de 0 a 1 ano devem viajar ali, em bebê-conforto instalado de costas para o movimento.`,
+`Bebê: meio do banco de trás, em bebê-conforto e de costas para o movimento.`);
+
+Q(27, `Primeiros Socorros`,
+`Em caso de acidente com veículo transportando produtos inflamáveis, o procedimento correto do condutor é:`,
+[`Providenciar, o mais rápido possível, o escoamento do produto.`,`Sinalizar o local com tochas de fogo.`,`Efetuar, primeiramente, a limpeza do veículo.`,`A via deve ser interditada e todo local evacuado.`],3,
+`Diante de produtos inflamáveis, qualquer faísca ou chama pode causar explosão. O procedimento correto é isolar: interditar a via, evacuar o local, manter distância e acionar imediatamente o socorro especializado (Bombeiros).`,
+`Inflamável: nada de fogo, nada de mexer no produto. Isola, evacua e chama os bombeiros.`);
+
+Q(27, `Legislação`,
+`Em uma rodovia cuja velocidade máxima permitida é de 80 km/h, foi registrado por instrumento eletrônico um condutor dirigindo seu veículo a velocidade de 90 km/h. Esse condutor cometeu infração de natureza:`,
+[`Gravíssima.`,`Média.`,`Leve.`,`Grave.`],1,
+`O art. 218 do CTB gradua o excesso: até 20% acima do limite, infração MÉDIA; acima de 20% até 50%, infração GRAVE; acima de 50%, GRAVÍSSIMA com multa x3 e suspensão. Aqui 90 km/h em via de 80 km/h representa 12,5% de excesso, portanto infração média.`,
+`Até 20% acima do limite = média. Até 50% = grave. Acima de 50% = gravíssima.`);
+
+Q(27, `Primeiros Socorros`,
+`Não constitui medida básica para prestar assistência à vítima de acidente, após ter sinalizado o local:`,
+[`Verificar, primeiramente, os sinais vitais.`,`Determinar que o acidentado busque socorro.`,`Assumir a situação.`,`Proteger o acidentado.`],1,
+`A vítima nunca deve ser mandada buscar socorro: ela pode ter lesões internas ou na coluna e o esforço pode agravá-las. Quem assume a situação, protege a vítima, verifica os sinais vitais e aciona o socorro é o socorrista.`,
+`A vítima não busca socorro. Quem busca é você!`);
+
+Q(27, `Sinalização`,
+`A placa R-20 regulamenta:`,
+[`Área hospitalar.`,`Proibido ultrapassar.`,`Passagem obrigatória.`,`Proibido acionar buzina ou sinal sonoro.`],3,
+`A R-20 é "Proibido acionar buzina ou sinal sonoro", geralmente usada perto de hospitais e escolas. "Proibido ultrapassar" é a R-7.`,
+`R-20 = silêncio! Nada de buzina neste trecho.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(27, `Direção Defensiva`,
+`O condutor que, na direção do veículo, evita situações de acidentes ao trafegar com as devidas margens de segurança, está praticando uma direção defensiva:`,
+[`Corretiva.`,`Avaliativa.`,`Participativa.`,`Preventiva.`],3,
+`Direção defensiva preventiva é a que se antecipa ao perigo – manter distância, velocidade compatível e atenção. A corretiva é a reação de emergência para escapar de um perigo já instalado.`,
+`Agiu antes do perigo, com margem de segurança? Preventiva!`);
+
+Q(27, `Legislação`,
+`Estacionar na pista de rolamento de estradas, rodovias, vias de trânsito rápido e vias dotadas de acostamento é uma infração gravíssima. Qual a medida administrativa adotada para esta infração?`,
+[`Retenção do veículo.`,`Apreensão do veículo.`,`Recolhimento do documento de habilitação.`,`Remoção do veículo.`],3,
+`Um veículo estacionado na pista de uma rodovia é um obstáculo mortal. Por isso a medida administrativa é a REMOÇÃO do veículo (guincho), retirando o perigo da via imediatamente.`,
+`Carro parado atrapalhando na rodovia? Vai de guincho: remoção.`);
+
+Q(27, `Legislação`,
+`É falso afirmar que o candidato à habilitação é uma pessoa que:`,
+[`Pode ser responsabilizada penalmente.`,`Sabe ler e escrever.`,`Tem ensino fundamental, no mínimo.`,`Possui documento de identidade.`],2,
+`O art. 140 do CTB exige do candidato: ser penalmente imputável, saber ler e escrever e possuir documento de identidade. Não existe exigência de escolaridade mínima – por isso a alternativa C é a falsa.`,
+`Basta saber ler e escrever – não é preciso ter ensino fundamental completo.`);
+
+Q(27, `Sinalização`,
+`Circular é a forma destinada às placas:`,
+[`De Advertência.`,`De Indicação.`,`De Regulamentação.`,`Educativas.`],2,
+`As placas de regulamentação são circulares (com exceção do PARE, que é octogonal, e da Dê a Preferência, triangular invertida). As de advertência são quadradas apoiadas num vértice (losango) e as de indicação, retangulares.`,
+`Círculo = ordem (regulamentação). Losango = perigo (advertência). Retângulo = informação.`);
+
+Q(27, `Legislação`,
+`Segundo a classificação das vias urbanas, uma via destinada apenas ao acesso às áreas restritas é chamada:`,
+[`Local.`,`Secundária.`,`Particular.`,`Preferencial.`],0,
+`As vias urbanas são classificadas em: trânsito rápido, arterial, coletora e local. A via LOCAL é caracterizada por interseções em nível não semaforizadas, destinada apenas ao acesso local ou a áreas restritas, com velocidade máxima de 30 km/h.`,
+`Rua de bairro, só para chegar em casa: via local (30 km/h).`);
+
+Q(27, `Legislação`,
+`Estão previstas quatro categorias de infração. Cada uma corresponde a um certo número de pontos. Para a infração:`,
+[`Gravíssima são computados dez pontos.`,`Leve são computados dois pontos.`,`Grave são computados seis pontos.`,`Média são computados quatro pontos.`],3,
+`A pontuação do art. 259 do CTB é: gravíssima 7 pontos, grave 5 pontos, média 4 pontos e leve 3 pontos. Apenas a alternativa D traz o valor correto.`,
+`Decore 7-5-4-3: gravíssima, grave, média e leve.`);
+
+Q(27, `Meio Ambiente`,
+`O conversor catalítico (catalisador), instalado no coletor de escapamento do veículo, é um:`,
+[`Transformador de gases tóxicos em gases não nocivos ao meio ambiente.`,`Filtro dos gases do escapamento.`,`Acelerador de moléculas binárias, oposto aos gases de escapamento.`,`Filtro dos gases do escapamento, que separa o vapor d'água dos gases.`],0,
+`O catalisador não filtra nada: ele provoca reações químicas que transformam gases tóxicos (monóxido de carbono, hidrocarbonetos, óxidos de nitrogênio) em substâncias menos nocivas, como gás carbônico, vapor d'água e nitrogênio.`,
+`Catalisador TRANSFORMA gás venenoso em gás inofensivo – não é filtro!`);
+
+Q(27, `Direção Defensiva`,
+`Estando o condutor na direção do veículo e este se apresentando com os pneus gastos, freios desregulados, luz deficiente, significa exemplo de condição adversa do:`,
+[`Condutor.`,`Trânsito.`,`Equipamento de segurança.`,`Veículo.`],3,
+`Pneu, freio e luz são componentes do carro. Falhas de conservação nesses itens caracterizam condição adversa do VEÍCULO.`,
+`Freio, pneu e luz são peças do carro = condição adversa do veículo.`);
+
+Q(27, `Legislação`,
+`Marque a alternativa correta sobre a realização de testes de alcoolemia:`,
+[`O etilômetro mede o ar expelido pelos pulmões.`,`É obrigatória a realização de teste de alcoolemia quando houver vítimas fatais de acidente de trânsito.`,`O condutor não pode se recusar à realização de testes, senão incorrerá em infração de recusa (Art. 165-A).`,`Todas as afirmativas acima estão corretas.`],3,
+`As três afirmações são verdadeiras: o etilômetro ("bafômetro") mede o álcool no ar dos pulmões; em acidente com vítima fatal o teste é obrigatório; e recusar-se a fazer o teste é infração gravíssima do art. 165-A, com multa x10 e suspensão do direito de dirigir por 12 meses.`,
+`Recusar o bafômetro dá a mesma punição de dirigir embriagado. Todas corretas!`);
+
+Q(27, `Direção Defensiva`,
+`Verificar se o espaço é suficiente, sinalizar com antecedência e retomar à posição anterior são procedimentos para executar uma:`,
+[`Frenagem brusca.`,`Ultrapassagem de outro veículo em movimento.`,`Entrada em via arterial.`,`Passagem de outro veículo em movimento.`],1,
+`Esses três passos descrevem exatamente a ultrapassagem: certificar-se do espaço livre, sinalizar a intenção, passar pela esquerda e retornar à faixa de origem com segurança e sinalização.`,
+`Ver espaço, dar seta, passar e voltar: isso é ultrapassagem.`);
+
+Q(27, `Mecânica`,
+`No motor a combustão, a mistura ar-combustível é lançada dentro do cilindro, resultando em energia que movimenta o veículo. Mas existem exceções quanto aos componentes utilizados. Qual tipo de motor dispensa distribuidor, velas e bobina?`,
+[`A álcool.`,`A diesel.`,`A Gás Natural Veicular.`,`À gasolina.`],1,
+`O motor diesel não usa faísca: o ar é comprimido a ponto de atingir uma temperatura altíssima e o diesel injetado inflama espontaneamente (ignição por compressão). Por isso ele dispensa velas, bobina e distribuidor.`,
+`Diesel não usa faísca, usa compressão. Sem vela, sem bobina, sem distribuidor.`);
+
+Q(27, `Legislação`,
+`O condutor habilitado na categoria "B" só poderá dirigir:`,
+[`Ônibus.`,`Caminhão.`,`Veículos de carga de até 3.500 kg e veículo de passeio.`,`Qualquer veículo de até 3.500 kg, inclusive moto.`],2,
+`A categoria B habilita a conduzir veículo automotor cujo peso bruto total não exceda 3.500 kg e cuja lotação não ultrapasse 8 lugares além do motorista. Moto não entra: exige categoria A.`,
+`B é carro de passeio e utilitário até 3.500 kg. Moto só com a categoria A!`);
+
+Q(27, `Primeiros Socorros`,
+`"Não entre em pânico. Pensar é tão importante quanto agir!" Essa frase refere-se:`,
+[`À direção defensiva.`,`À direção preventiva.`,`À prestação de socorros.`,`Ao acionamento de recursos.`],2,
+`É a primeira regra do socorrista: manter a calma para avaliar a cena, garantir a própria segurança e não agravar o estado da vítima com atitudes precipitadas.`,
+`Socorrer começa na cabeça: primeiro pense, depois aja.`);
+
+Q(27, `Sinalização`,
+`A placa A-26a adverte:`,
+[`Passagem obrigatória.`,`Sentido único.`,`Sentido de circulação de via.`,`Siga em frente.`],1,
+`Na série de advertência, A-26a é "Sentido único" e A-26b é "Sentido duplo". São placas de advertência (losango amarelo) que informam como é a circulação da via adiante.`,
+`A-26a = sentido único; A-26b = sentido duplo.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(27, `Direção Defensiva`,
+`Manter uma distância do veículo da frente é uma:`,
+[`Conduta que contraria as normas de direção defensiva.`,`Condição segura para que o condutor tenha tempo de reagir e acionar os faróis diante de situação de emergência.`,`Condição segura para que o condutor tenha tempo de reagir e acionar os freios em situação de emergência.`,`Conduta errada do condutor defensivo.`],2,
+`A distância de seguimento garante espaço e tempo para o condutor perceber o perigo e acionar os FREIOS (e não os faróis, como diz a alternativa B) antes de colidir com quem vai à frente.`,
+`Distância de segurança serve para dar tempo de FREAR. Cuidado com a pegadinha "faróis"!`);
+
+Q(27, `Cidadania`,
+`Para prática do bom comportamento no trânsito, você precisa conviver harmoniosamente na sociedade. Como cidadão, o motorista precisa:`,
+[`Entender que seus direitos não têm limites.`,`Ser intolerante e incompreensivo com os erros dos outros condutores e/ou pedestres.`,`Evitar cometimento de infrações e comportamentos agressivos em benefício de todos que estão no trânsito.`,`Não abrir mão dos próprios direitos.`],2,
+`Conviver bem no trânsito significa respeitar as regras e agir sem agressividade, entendendo que o direito de cada um termina onde começa o do outro.`,
+`Sem infração e sem agressividade: é assim que se convive bem no trânsito.`);
+
+Q(27, `Direção Defensiva`,
+`Na direção defensiva, é o resultado da prática mais o treinamento:`,
+[`Conhecimento.`,`Decisão.`,`Atenção.`,`Habilidade.`],3,
+`Habilidade é a capacidade prática de manobrar o veículo com segurança, e ela só se adquire com prática e treinamento constantes. É um dos cinco fundamentos da direção defensiva.`,
+`Prática + treinamento = Habilidade.`);
+
+
+/* Caderno 28 – Prova Geral */
+
+Q(28, `Sinalização`,
+`A placa A-13b indica:`,
+[`Confluência à esquerda.`,`Confluência à direita.`,`Entroncamento oblíquo à esquerda.`,`Entroncamento oblíquo à direita.`],1,
+`Na série de advertência, A-13a é "Confluência à esquerda" e A-13b é "Confluência à direita". Confluência é a junção de duas correntes de tráfego no mesmo sentido – atenção com quem entra na sua via.`,
+`A-13a = confluência à esquerda; A-13b = confluência à direita.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(28, `Mecânica`,
+`No sistema de arrefecimento não se utiliza o seguinte componente:`,
+[`Filtro de óleo.`,`Ventoinha ou ventilador.`,`Radiador.`,`Bomba d'água.`],0,
+`O arrefecimento (resfriamento do motor) usa radiador, bomba d'água, ventoinha, mangueiras, válvula termostática e o líquido de arrefecimento. O filtro de óleo pertence ao sistema de lubrificação.`,
+`Filtro de óleo é lubrificação. Arrefecimento é água, radiador e ventoinha.`);
+
+Q(28, `Legislação`,
+`A velocidade mínima permitida em uma via de trânsito rápido sem sinalização é de:`,
+[`30 km/h.`,`40 km/h.`,`80 km/h.`,`60 km/h.`],1,
+`A velocidade mínima é a metade da máxima permitida para a via. Na via de trânsito rápido não sinalizada a máxima é 80 km/h, logo a mínima é 40 km/h. Andar abaixo disso, sem motivo, é infração média.`,
+`Mínima = metade da máxima. 80 ÷ 2 = 40 km/h.`);
+
+Q(28, `Direção Defensiva`,
+`Automatismo correto significa:`,
+[`Atenção fixa.`,`Atenção dispersiva.`,`Gesto inconsciente efetuado de forma segura.`,`Indisciplina na condução do veículo.`],2,
+`Automatismos são ações executadas de forma automática e inconsciente pela repetição (trocar marcha, dar seta). Quando esses gestos são feitos de forma segura, chamam-se automatismos corretos.`,
+`Automatismo = automático (inconsciente). Correto = feito com segurança.`);
+
+Q(28, `Sinalização`,
+`A placa R-18 significa:`,
+[`Comprimento máximo permitido.`,`Largura máxima permitida.`,`Peso máximo permitido por eixo.`,`Altura máxima permitida.`],0,
+`Sequência das placas de regulamentação de limites: R-14 peso bruto total, R-15 altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo permitido.`,
+`R-15 altura, R-16 largura, R-17 peso por eixo, R-18 comprimento.`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+
+Q(28, `Meio Ambiente`,
+`Alguns cuidados que devemos ter com os veículos para reduzir a poluição do meio ambiente:`,
+[`Regular o carburador ou sistema de injeção eletrônica.`,`Manter em bom estado de funcionamento bobina, ignição eletrônica, distribuidor e vela.`,`Verificar e revisar qualquer ruído estranho no escapamento.`,`Todas as alternativas estão corretas.`],3,
+`Todos esses cuidados fazem a queima do combustível ser mais completa e o escapamento funcionar corretamente, reduzindo a emissão de gases e o ruído. Carro bem regulado polui menos e gasta menos.`,
+`Manutenção em dia = menos poluição e menos gasto. Todas corretas!`);
+
+Q(28, `Legislação`,
+`Um condutor de ônibus foi flagrado trafegando em uma rodovia não sinalizada a 136 km/h. Qual punição será aplicada?`,
+[`Infração gravíssima com multa agravada (3x) e suspensão do direito de dirigir.`,`Infração grave e suspensão do direito de dirigir.`,`Infração grave e apreensão do veículo.`,`Infração gravíssima e cassação da CNH.`],0,
+`Em rodovia não sinalizada, o limite para ônibus e caminhões é 90 km/h. A 136 km/h o excesso passa de 50% do limite, o que configura infração gravíssima com multa multiplicada por três e suspensão imediata do direito de dirigir (art. 218, III).`,
+`Mais de 50% acima do limite: gravíssima, multa x3 e suspensão.`);
+
+Q(28, `Legislação`,
+`Qual a validade da Permissão para Dirigir?`,
+[`5 anos.`,`10 anos.`,`1 ano.`,`A mesma do exame médico.`],2,
+`A Permissão para Dirigir (PPD) é válida por 1 ano. Passado esse período sem cometer infração grave ou gravíssima, nem ser reincidente em infração média, o condutor recebe a CNH definitiva.`,
+`PPD = 1 ano de "período de prova".`);
+
+Q(28, `Direção Defensiva`,
+`O procedimento correto em um declive acentuado é:`,
+[`Utilizar o "ponto morto".`,`Utilizar a mesma marcha que seria necessária no caso de um aclive acentuado.`,`Testar o acelerador e desengrenar o veículo.`,`Desligar o motor do veículo.`],1,
+`Em descidas fortes usa-se o freio-motor, engrenando a mesma marcha que seria usada para subir aquela ladeira. Isso evita o superaquecimento e a perda de eficiência dos freios (fading). Descer em ponto morto é inclusive infração de trânsito.`,
+`Marcha para subir = marcha para descer. Nunca desça em ponto morto!`);
+
+Q(28, `Primeiros Socorros`,
+`Não é correto adotar a seguinte conduta para imobilização em caso de fratura:`,
+[`Manter a vítima deitada.`,`O comprimento de uma tala deverá ser suficiente para imobilizar, também, a articulação.`,`Antes de imobilizar, puxar o membro colocando-o na posição natural.`,`Aplicar panos limpos sobre as fraturas expostas.`],2,
+`Nunca se puxa, dobra ou tenta "colocar no lugar" um membro fraturado: isso pode romper vasos e nervos e agravar muito a lesão. A imobilização deve ser feita na posição em que o membro se encontra.`,
+`Fratura não se puxa nem se endireita. Imobilize como está!`);
+
+Q(28, `Direção Defensiva`,
+`Fator que não altera a aderência é:`,
+[`Tipo de solo.`,`Tipo de combustível.`,`Chuva.`,`Calibragem dos pneus.`],1,
+`A aderência depende do atrito entre pneu e solo: tipo de piso, estado e calibragem dos pneus e presença de água. O combustível usado pelo motor não influencia em nada esse atrito.`,
+`O pneu não liga para o combustível do carro; ele só quer se agarrar ao chão.`);
+
+Q(28, `Legislação`,
+`Estacionar o veículo em desacordo com a regulamentação estabelecida pela autoridade de trânsito acarretará:`,
+[`Multa e retenção da CNH.`,`Retenção do veículo e da Carteira de Habilitação.`,`Multa e remoção do veículo.`,`Multa e retenção do veículo.`],2,
+`Estacionamento irregular gera multa e a medida administrativa de REMOÇÃO do veículo (guincho), já que o veículo está atrapalhando a circulação e não há condutor no local para regularizar.`,
+`Estacionou errado: multa + guincho (remoção).`);
+
+Q(28, `Cidadania`,
+`No grupo social, o cidadão deve:`,
+[`Seguir a escolha de todos.`,`Atuar sempre de forma individual.`,`Aceitar pressões e cobranças.`,`Adotar as características positivas que adquire no dia a dia.`],3,
+`Viver em sociedade exige assimilar e praticar os valores positivos aprendidos na convivência – respeito, solidariedade, responsabilidade – e não simplesmente ceder à pressão do grupo ou agir isoladamente.`,
+`Cidadão bom é o que leva para o grupo o que aprendeu de positivo.`);
+
+Q(28, `Sinalização`,
+`A placa TAR-03 indica:`,
+[`Praia.`,`Parque urbano.`,`Área de estacionamento.`,`Patrimônio natural.`],0,
+`As placas TAR fazem parte da sinalização turística e indicam atrativos turísticos da região (praias, cachoeiras, parques, patrimônios). A TAR-03 corresponde ao atrativo "praia". Área de estacionamento não é sinalização turística, e sim de serviço auxiliar (SAU).`,
+`TAR = sinalização de atrativo turístico (praia, parque, patrimônio...).`,
+`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Confira o pictograma no seu caderno: a resposta é o atrativo turístico desenhado na placa.`);
+
+Q(28, `Mecânica`,
+`Debrear é o mesmo que:`,
+[`Apoiar o pé no pedal de freio continuamente.`,`Regular o cabo em todas as trocas de óleo.`,`Acionar a embreagem.`,`Acionar a alavanca de mudanças.`],2,
+`Debrear é pisar na embreagem, desconectando o motor da transmissão para trocar de marcha. Embrear é soltar o pedal, voltando a conectar o motor às rodas.`,
+`DEbrear = DEsligar o motor das rodas (pisar na embreagem).`);
+
+Q(28, `Primeiros Socorros`,
+`Num acidente observamos que o ferimento de uma vítima esguicha sangue no mesmo ritmo de sua pulsação. Conclui-se que ocorreu o corte de:`,
+[`Uma veia.`,`Uma artéria.`,`Um músculo.`,`Um nervo.`],1,
+`O sangue arterial sai em jatos, no ritmo dos batimentos cardíacos, e é vermelho vivo, pois vem direto do coração sob pressão. O sangramento venoso é contínuo e mais escuro. Hemorragia arterial é emergência: comprima imediatamente.`,
+`Esguicha no ritmo do coração e é vermelho vivo = artéria.`);
+
+Q(28, `Legislação`,
+`Marcelo e Bárbara passaram na prova de direção veicular dia 19 de novembro de 2015. No dia 10 de dezembro do mesmo ano eles avançaram o sinal vermelho do semáforo enquanto se cumprimentavam. O que aconteceu com eles?`,
+[`Tiveram que pagar uma multa gravíssima, houve a suspensão da CNH e tiveram que frequentar o curso de reciclagem.`,`Tiveram que pagar uma multa grave, houve a suspensão da PPD e tiveram que frequentar o curso de reciclagem.`,`Tiveram que pagar uma multa gravíssima, a PPD foi cassada (cancelada) e tiveram que reiniciar o processo de habilitação.`,`Tiveram que pagar uma multa média, a CNH foi suspensa e tiveram que reiniciar o processo de habilitação.`],2,
+`Eles estavam no período da Permissão para Dirigir (1 ano). Avançar o sinal vermelho é infração GRAVÍSSIMA, e quem comete infração grave ou gravíssima durante a PPD não obtém a CNH: a permissão é cancelada e o processo de habilitação precisa ser reiniciado do zero.`,
+`Na PPD, uma grave ou gravíssima já derruba tudo: recomeça o processo!`);
+
+Q(28, `Direção Defensiva`,
+`Entre outros efeitos, a ingestão de álcool pode provocar no condutor:`,
+[`Diminuição da capacidade de visualização.`,`Melhor capacidade de raciocínio lógico.`,`Visão difusa e agilidade.`,`Melhora da capacidade de raciocínio.`],0,
+`O álcool é depressor do sistema nervoso central: reduz o campo visual (efeito túnel), a percepção de profundidade e a velocidade de reação. Nada do que ele provoca "melhora" a condução.`,
+`Álcool nunca melhora nada: reduz visão, reflexo e raciocínio.`);
+
+Q(28, `Legislação`,
+`Para o licenciamento de um veículo é obrigatório:`,
+[`Pagar o IPVA.`,`Pagar o DPVAT.`,`Passar por uma inspeção veicular.`,`Todas acima estão corretas.`],3,
+`O licenciamento anual exige a quitação dos débitos do veículo – IPVA, seguro obrigatório e multas – e a aprovação em inspeção veicular quando esta for exigida pelo órgão executivo de trânsito.`,
+`Licenciar = quitar tudo (IPVA, seguro, multas) e passar na vistoria.`);
+
+Q(28, `Legislação`,
+`Não é considerado crime de trânsito:`,
+[`Dirigir em excesso de velocidade.`,`Homicídio culposo.`,`Omissão de socorro.`,`Lesão corporal culposa.`],0,
+`Excesso de velocidade é infração administrativa (multa e pontos), não crime. Os crimes de trânsito estão nos arts. 302 a 312 do CTB: homicídio culposo, lesão corporal culposa, omissão de socorro, embriaguez ao volante, racha, dirigir sem habilitação gerando perigo, entre outros.`,
+`Correr demais dá multa. Matar, ferir ou deixar de socorrer dá processo criminal.`);
+
+Q(28, `Mecânica`,
+`A indústria automobilística está em constante aperfeiçoamento nos veículos modernos. A direção que ajuda a diminuir o esforço físico é:`,
+[`Elétrica.`,`Normal.`,`Dinâmica.`,`Mecânica.`],0,
+`A direção elétrica (assim como a hidráulica) usa uma fonte auxiliar de força para movimentar o sistema de esterçamento, reduzindo bastante o esforço do motorista. A direção mecânica comum não tem essa assistência.`,
+`Direção assistida (elétrica/hidráulica) faz a força por você.`);
+
+Q(28, `Legislação`,
+`Qual modelo de óculos é obrigatório para uso com o capacete aberto e não deve ser substituído por qualquer outro modelo?`,
+[`Os óculos de proteção EPI.`,`Óculos de sol.`,`Óculos com lente de grau.`,`Nenhuma das respostas acima está correta.`],0,
+`Com capacete sem viseira, é obrigatório o uso de óculos de proteção certificados como EPI, que resistem a impactos e protegem contra vento, poeira e insetos. Óculos de sol ou de grau comuns podem estilhaçar e não servem.`,
+`Capacete aberto exige óculos de proteção EPI – não vale óculos de sol.`);
+
+Q(28, `Meio Ambiente`,
+`Para reduzir a emissão de poluentes do ar causados pelos veículos, é incorreto afirmar que se deve:`,
+[`Fazer uso de dispositivo de controle de emissão de gases (catalisador).`,`Incentivar o uso de gás natural.`,`Regular periodicamente o motor do veículo.`,`Incentivar o transporte individual por veículos automotivos.`],3,
+`Incentivar o transporte individual aumenta o número de veículos circulando e, com ele, a emissão de poluentes. O correto é justamente o contrário: estimular o transporte coletivo e as caronas.`,
+`Mais carros na rua = mais poluição. O incentivo deve ser ao transporte coletivo.`);
+
+Q(28, `Primeiros Socorros`,
+`O trabalho de remoção de um acidentado deve ser feito por pessoal especializado, com equipamentos apropriados. Mas se numa emergência esse transporte precisar ser feito por você, qual procedimento pode ser considerado inadequado?`,
+[`Verificar se há deformações na coluna vertebral.`,`Improvisar uma maca para transporte do acidentado.`,`Remover a vítima do local da maneira mais rápida possível, pois esta necessita de atendimento urgente.`,`Evitar freadas bruscas e excesso de velocidade que podem agravar o estado da vítima.`],2,
+`Pressa na remoção é o maior erro: mover a vítima às pressas, sem avaliar a coluna e sem imobilização adequada, pode transformar uma lesão tratável em uma paralisia permanente.`,
+`Nunca tenha pressa para mexer na vítima. Avalie, imobilize e transporte com calma.`);
+
+Q(28, `Direção Defensiva`,
+`Está provado que mais de 90% dos acidentes de trânsito são causados por falhas humanas. Quais as principais causas dos acidentes?`,
+[`Imperícia.`,`Negligência.`,`Imprudência.`,`Todas acima.`],3,
+`As três formas de falha humana estão entre as principais causas: imprudência (agir sem cautela), negligência (deixar de fazer o que devia) e imperícia (falta de técnica ou habilidade).`,
+`O trio da falha humana: imprudência, negligência e imperícia.`);
+
+Q(28, `Direção Defensiva`,
+`Prever o perigo com antecedência significa:`,
+[`Definir o itinerário.`,`Evitar indecisões nos cruzamentos.`,`Definir opções de trajetos.`,`Todas acima.`],3,
+`Previsão é o planejamento antecipado: escolher o trajeto, ter rotas alternativas e chegar aos cruzamentos já sabendo o que fazer, sem hesitações que confundem os outros condutores.`,
+`Planejar rota, ter alternativas e não hesitar: tudo isso é prever o perigo.`);
+
+Q(28, `Legislação`,
+`O órgão máximo normativo do Sistema Nacional de Trânsito é:`,
+[`Departamento Nacional de Trânsito - DENATRAN.`,`Conselho Nacional de Trânsito - CONTRAN.`,`Circunscrição Regional de Trânsito - CIRETRAN.`,`Ministério da Justiça.`],1,
+`O CONTRAN é o órgão máximo NORMATIVO e consultivo do Sistema Nacional de Trânsito: é ele quem cria as resoluções e normas. O DENATRAN/SENATRAN é o órgão máximo EXECUTIVO da União.`,
+`CONTRAN = Conselho que faz as normas. DENATRAN = executa.`);
+
+Q(28, `Legislação`,
+`Não sendo imediata a identificação do infrator, o proprietário terá qual prazo para apresentá-lo?`,
+[`30 dias.`,`45 dias.`,`15 dias.`,`48 horas.`],2,
+`O art. 257, § 7º, do CTB dá ao proprietário o prazo de 15 dias, contados da notificação da autuação, para identificar o real condutor infrator. Se não identificar, o proprietário responde pela infração.`,
+`15 dias para apontar quem dirigia – senão a multa e os pontos são seus.`);
+
+Q(28, `Sinalização`,
+`O procedimento correto do condutor de veículo diante da sinalização semafórica ilustrada na imagem é:`,
+[`Reduzir a velocidade, adotando as medidas de precaução para imobilizar o veículo.`,`Frear bruscamente.`,`Aumentar a velocidade para passar logo.`,`Continuar na mesma velocidade.`],0,
+`Diante da luz amarela, o condutor deve reduzir a velocidade e se preparar para parar antes da faixa de retenção. Frear bruscamente causa colisão traseira e acelerar para "passar antes de fechar" é infração gravíssima.`,
+`Amarelo = atenção, prepare-se para parar (sem freada brusca).`,
+`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+
+Q(28, `Legislação`,
+`O condutor estando à noite em uma via urbana com iluminação pública deve:`,
+[`Manter as luzes do veículo apagadas para facilitar a visão dos outros condutores.`,`Manter acesas apenas as luzes dos faroletes para facilitar a visão dos outros condutores.`,`Usar o farol alto noturno, e opcionalmente, o diurno.`,`Usar o farol baixo desde o pôr-do-sol até o amanhecer.`],3,
+`À noite, em via urbana iluminada, o obrigatório é o farol BAIXO, do anoitecer ao amanhecer. O farol alto nessa situação ofusca os demais condutores e é infração de trânsito.`,
+`Cidade iluminada à noite = farol baixo. Alto só em estrada escura e sem outro carro.`);
+
+</script>
+<script>
+(function(){
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const LETRAS = ["A","B","C","D"];
+  const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
+                    25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
+
+  /* ---------- estado ---------- */
+  let selCad = [], selTema = [], selQtd = 30;
+  let fila = [], idx = 0, acertosPrimeira = 0, errosTotais = 0, errados = [], tentouErrar = false;
+
+  /* ---------- filtros ---------- */
+  const cadernos = [...new Set(QUESTOES.map(q => q.caderno))].sort((a,b)=>a-b);
+  const temas    = [...new Set(QUESTOES.map(q => q.tema))].sort();
+
+  $("totalBanco").textContent =
+    QUESTOES.length + " questões cadastradas, todas com gabarito e explicação salvos no sistema.";
+
+  function chip(txt, sub, on, onClick){
+    const b = document.createElement("button");
+    b.className = "chip" + (on ? " on" : "");
+    b.innerHTML = txt + (sub ? "<small>"+sub+"</small>" : "");
+    b.onclick = () => { onClick(b); };
+    return b;
+  }
+
+  function montaFiltros(){
+    // cadernos
+    const cc = $("fCadernos"); cc.innerHTML = "";
+    cc.appendChild(chip("Todos","210 questões", selCad.length===0, () => {
+      selCad = []; montaFiltros();
+    }));
+    cadernos.forEach(c => {
+      cc.appendChild(chip("Caderno "+c, NOME_CAD[c], selCad.includes(c), () => {
+        selCad.includes(c) ? selCad = selCad.filter(x=>x!==c) : selCad.push(c);
+        montaFiltros();
+      }));
+    });
+    // temas
+    const tc = $("fTemas"); tc.innerHTML = "";
+    tc.appendChild(chip("Todas","", selTema.length===0, () => { selTema = []; montaFiltros(); }));
+    temas.forEach(t => {
+      const n = QUESTOES.filter(q=>q.tema===t).length;
+      tc.appendChild(chip(t, n+" questões", selTema.includes(t), () => {
+        selTema.includes(t) ? selTema = selTema.filter(x=>x!==t) : selTema.push(t);
+        montaFiltros();
+      }));
+    });
+    // quantidade
+    const qc = $("fQtd"); qc.innerHTML = "";
+    [10,20,30,40,"Todas"].forEach(q => {
+      qc.appendChild(chip(q === "Todas" ? "Todas" : q+" questões","", selQtd===q, () => {
+        selQtd = q; montaFiltros();
+      }));
+    });
+    const disp = filtrar().length;
+    $("dicaSel").textContent = disp + " questões disponíveis com os filtros escolhidos.";
+    $("btnIniciar").disabled = disp === 0;
+  }
+
+  function filtrar(){
+    let lista = QUESTOES.filter(q =>
+      (selCad.length === 0  || selCad.includes(q.caderno)) &&
+      (selTema.length === 0 || selTema.includes(q.tema))
+    );
+    // quando há mistura de cadernos, remove questões repetidas (mesmo enunciado)
+    if (selCad.length !== 1){
+      const vistos = new Set();
+      lista = lista.filter(q => {
+        const k = q.e.toLowerCase().replace(/[^a-zà-ú0-9]/g,"").slice(0,90);
+        if (vistos.has(k)) return false;
+        vistos.add(k); return true;
+      });
+    }
+    return lista;
+  }
+
+  function embaralhar(a){
+    const arr = a.slice();
+    for (let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ---------- fluxo ---------- */
+  function iniciar(lista){
+    fila = lista;
+    idx = 0; acertosPrimeira = 0; errosTotais = 0; errados = [];
+    $("telaInicio").classList.add("hidden");
+    $("telaFim").classList.add("hidden");
+    $("telaQuestao").classList.remove("hidden");
+    $("stats").classList.remove("hidden");
+    window.scrollTo(0,0);
+    mostrar();
+  }
+
+  function mostrar(){
+    const q = fila[idx];
+    tentouErrar = false;
+    $("avisoBox").innerHTML = "";
+
+    $("tags").innerHTML =
+      '<span class="tag">Caderno ' + q.caderno + '</span>' +
+      '<span class="tag">' + q.tema + '</span>' +
+      '<span class="tag">Questão ' + (idx+1) + ' de ' + fila.length + '</span>';
+
+    $("enunciado").textContent = q.e;
+
+    if (q.nota){ $("nota").textContent = "ℹ️ " + q.nota; $("nota").classList.remove("hidden"); }
+    else $("nota").classList.add("hidden");
+
+    const box = $("alts"); box.innerHTML = "";
+    q.alts.forEach((texto, i) => {
+      const b = document.createElement("button");
+      b.className = "alt";
+      b.innerHTML = '<span class="ltr">' + LETRAS[i] + '</span><span>' + texto + '</span>';
+      b.onclick = () => responder(i, b);
+      box.appendChild(b);
+    });
+
+    atualizaTopo();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function atualizaTopo(){
+    $("pProg").textContent = (idx+1) + "/" + fila.length;
+    $("pOk").textContent  = "✓ " + acertosPrimeira;
+    $("pErr").textContent = "✕ " + errosTotais;
+    $("barra").style.width = (idx / fila.length * 100) + "%";
+  }
+
+  function responder(i, botao){
+    const q = fila[idx];
+    if (botao.disabled) return;
+
+    if (i === q.c){
+      botao.classList.add("certa");
+      [...$("alts").children].forEach(b => b.disabled = true);
+      if (!tentouErrar) acertosPrimeira++;
+      atualizaTopo();
+      setTimeout(abrirExplicacao, 250);
+    } else {
+      errosTotais++;
+      if (!tentouErrar){ errados.push(q); tentouErrar = true; }
+      botao.classList.add("errada","shake");
+      botao.disabled = true;
+      setTimeout(() => botao.classList.remove("shake"), 400);
+      $("avisoBox").innerHTML =
+        '<div class="aviso"><span class="ic">🤔</span><span>' +
+        '<b>Ops, não é essa!</b><br>' +
+        'Leia o enunciado com calma e tente de novo — você consegue. ' +
+        'A explicação aparece assim que você acertar.</span></div>';
+      atualizaTopo();
+    }
+  }
+
+  function abrirExplicacao(){
+    const q = fila[idx];
+    $("mTitulo").textContent = tentouErrar ? "✅ Isso! Agora sim." : "🎉 Você acertou de primeira!";
+    $("mResposta").textContent = "Resposta correta: " + LETRAS[q.c] + ") " + q.alts[q.c];
+    $("mExp").textContent = q.exp;
+    $("mMacete").innerHTML = "<b>💡 Macete para lembrar:</b> " + q.mac;
+    $("btnProx").textContent = (idx === fila.length - 1) ? "Ver meu resultado →" : "Próxima questão →";
+    $("overlay").classList.remove("hidden");
+    $("overlay").querySelector(".modal").scrollTop = 0;
+  }
+
+  function proxima(){
+    $("overlay").classList.add("hidden");
+    if (idx === fila.length - 1){ finalizar(); return; }
+    idx++;
+    mostrar();
+  }
+
+  function finalizar(){
+    $("telaQuestao").classList.add("hidden");
+    $("overlay").classList.add("hidden");
+    $("telaFim").classList.remove("hidden");
+    $("stats").classList.add("hidden");
+    $("barra").style.width = "100%";
+
+    const feitas = Math.min(idx + 1, fila.length);
+    const pct = Math.round(acertosPrimeira / feitas * 100);
+    $("scoreNum").innerHTML = pct + "<small>%</small>";
+    $("scoreTxt").textContent = acertosPrimeira + " de " + feitas + " questões acertadas na primeira tentativa · " + errosTotais + " erro(s) no total";
+
+    let msg, sub;
+    if (pct >= 90){ msg = "🏆 Excelente!"; sub = "Nesse ritmo a prova do DETRAN é passeio."; }
+    else if (pct >= 70){ msg = "✅ Aprovado!"; sub = "Acima dos 70% exigidos na prova. Revise os erros e mantenha o ritmo."; }
+    else if (pct >= 50){ msg = "⚠️ Quase lá"; sub = "A prova exige 70% de acerto. Refaça o simulado focando nas matérias que caíram mais."; }
+    else { msg = "📚 Hora de estudar"; sub = "Releia as explicações com calma e refaça o simulado. Toda questão errada aqui é uma a menos na prova."; }
+    $("scoreMsg").textContent = msg;
+    $("scoreSub").textContent = sub;
+
+    if (errados.length){
+      $("cardRev").classList.remove("hidden");
+      $("btnSoErros").classList.remove("hidden");
+      $("revList").innerHTML = errados.map(q =>
+        '<div class="rev-item"><div class="q">' + q.e + '</div>' +
+        '<div class="a">✔ ' + LETRAS[q.c] + ") " + q.alts[q.c] + '</div></div>'
+      ).join("");
+    } else {
+      $("cardRev").classList.add("hidden");
+      $("btnSoErros").classList.add("hidden");
+    }
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  /* ---------- eventos ---------- */
+  $("btnIniciar").onclick = () => {
+    const disp = embaralhar(filtrar());
+    const n = (selQtd === "Todas") ? disp.length : Math.min(selQtd, disp.length);
+    iniciar(disp.slice(0, n));
+  };
+  $("btnProx").onclick = proxima;
+  $("btnSair").onclick = finalizar;
+  $("btnRefazer").onclick = () => $("btnIniciar").click();
+  $("btnVoltar").onclick = () => {
+    $("telaFim").classList.add("hidden");
+    $("telaInicio").classList.remove("hidden");
+    $("barra").style.width = "0";
+    window.scrollTo(0,0);
+  };
+  $("btnSoErros").onclick = () => iniciar(embaralhar(errados));
+
+  document.addEventListener("keydown", e => {
+    if (!$("overlay").classList.contains("hidden")){
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); proxima(); }
+      return;
+    }
+    if ($("telaQuestao").classList.contains("hidden")) return;
+    const k = e.key.toUpperCase();
+    let i = LETRAS.indexOf(k);
+    if (i < 0 && "1234".includes(k)) i = Number(k) - 1;
+    if (i >= 0){
+      const b = $("alts").children[i];
+      if (b && !b.disabled) b.click();
+    }
+  });
+
+  montaFiltros();
+})();
+</script>
+</body>
+</html>

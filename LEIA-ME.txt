@@ -1,0 +1,32 @@
+SIMULADO DETRAN - como usar
+===========================
+
+1) Dê dois cliques em "index.html". Ele abre no navegador e funciona
+   sem internet, no computador e no celular.
+
+2) Para usar no celular: mande o arquivo index.html para você mesmo
+   (WhatsApp, e-mail, Google Drive) e abra pelo navegador do celular.
+   Ele é um arquivo único, não precisa de mais nada.
+
+Como funciona
+-------------
+- As questões são sorteadas a cada rodada (dá para filtrar por caderno,
+  por matéria e escolher quantas questões quer responder).
+- Marcou a alternativa errada: ela fica vermelha e o site pede para
+  tentar de novo, sem entregar a resposta.
+- Marcou a certa: abre a explicação completa (o porquê da resposta e um
+  macete para memorizar).
+- No fim aparece o percentual de acerto de primeira tentativa e a lista
+  das questões que você errou, com um botão para treinar só elas.
+
+Conteúdo: 210 questões (cadernos 19, 20, 21, 25, 26, 27 e 28), todas com
+gabarito e explicação salvos dentro do próprio arquivo.
+
+Para editar/adicionar questões
+------------------------------
+- As questões ficam em dados/19.js, dados/20.js ... dados/28.js
+  (formato: enunciado, alternativas, índice da correta - 0=A, 1=B, 2=C,
+  3=D -, explicação e macete).
+- O layout do site fica em src/template.html
+- Depois de editar, rode no terminal:   node build.js
+  Isso regenera o index.html com tudo junto de novo.

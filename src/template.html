@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f1720">
+<title>Simulado DETRAN</title>
+<style>
+:root{
+  --bg:#0f1720;
+  --bg2:#16212d;
+  --card:#1b2735;
+  --card2:#22303f;
+  --line:#2c3d4f;
+  --txt:#eaf1f8;
+  --txt2:#9fb2c4;
+  --azul:#3d9bff;
+  --verde:#22c55e;
+  --verde-bg:#0f3323;
+  --vermelho:#ef4444;
+  --vermelho-bg:#3a1616;
+  --amarelo:#facc15;
+  --raio:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  font-size:16px;line-height:1.5;
+  min-height:100vh;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.wrap{max-width:820px;margin:0 auto;padding:16px}
+h1,h2,h3{margin:0 0 8px;line-height:1.25}
+h1{font-size:26px;letter-spacing:-.4px}
+p{margin:0 0 12px}
+.hidden{display:none !important}
+
+/* ---------- topo ---------- */
+header.top{
+  position:sticky;top:0;z-index:20;
+  background:rgba(15,23,32,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.top-in{max-width:820px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+.logo{font-weight:800;font-size:15px;letter-spacing:.5px;white-space:nowrap}
+.logo span{color:var(--amarelo)}
+.top-stats{margin-left:auto;display:flex;gap:8px;font-size:13px;font-weight:700}
+.pill{padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line)}
+.pill.ok{color:var(--verde);border-color:#1e4634}
+.pill.err{color:var(--vermelho);border-color:#4a2020}
+.bar{height:4px;background:var(--card);overflow:hidden}
+.bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--azul),var(--verde));transition:width .35s ease}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--raio);padding:18px;margin-bottom:14px}
+.muted{color:var(--txt2);font-size:14px}
+
+/* ---------- formulário inicial ---------- */
+.label{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);font-weight:700;margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  border:1px solid var(--line);background:var(--card2);color:var(--txt);
+  padding:9px 14px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;
+  transition:.15s;
+}
+.chip:hover{border-color:#3f5872}
+.chip.on{background:var(--azul);border-color:var(--azul);color:#04101d}
+.chip small{display:block;font-size:11px;font-weight:600;opacity:.75}
+
+.btn{
+  display:block;width:100%;border:0;border-radius:12px;padding:16px;
+  font-size:17px;font-weight:800;cursor:pointer;transition:.15s;
+  background:var(--azul);color:#04101d;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+.btn.verde{background:var(--verde);color:#04140b}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap}
+.btn-row .btn{flex:1 1 180px;width:auto}
+
+/* ---------- questão ---------- */
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  padding:4px 9px;border-radius:6px;background:var(--card2);color:var(--txt2);border:1px solid var(--line)}
+.enunciado{font-size:18px;font-weight:600;margin-bottom:16px}
+@media(min-width:640px){.enunciado{font-size:19px}}
+.nota{font-size:13px;color:var(--amarelo);background:rgba(250,204,21,.08);
+  border:1px solid rgba(250,204,21,.28);border-radius:10px;padding:9px 12px;margin-bottom:14px}
+
+.alts{display:flex;flex-direction:column;gap:10px}
+.alt{
+  display:flex;gap:12px;align-items:flex-start;text-align:left;width:100%;
+  background:var(--card2);border:1px solid var(--line);color:var(--txt);
+  border-radius:12px;padding:14px;font-size:15.5px;line-height:1.45;
+  cursor:pointer;transition:.15s;font-family:inherit;
+}
+.alt:hover:not(:disabled){border-color:var(--azul);background:#26374a}
+.alt .ltr{
+  flex:0 0 28px;height:28px;border-radius:8px;background:#33475d;color:#dbe8f5;
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px
+}
+.alt.errada{background:var(--vermelho-bg);border-color:var(--vermelho);color:#ffc9c9;opacity:.85;cursor:not-allowed}
+.alt.errada .ltr{background:var(--vermelho);color:#fff}
+.alt.certa{background:var(--verde-bg);border-color:var(--verde);color:#c4f5d9}
+.alt.certa .ltr{background:var(--verde);color:#04140b}
+.alt:disabled{cursor:default}
+.shake{animation:shake .4s}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-7px)}
+  40%{transform:translateX(7px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+
+/* aviso de erro */
+.aviso{
+  margin-top:14px;border-radius:12px;padding:14px;
+  background:var(--vermelho-bg);border:1px solid var(--vermelho);color:#ffd4d4;
+  font-weight:600;display:flex;gap:10px;align-items:flex-start;
+  animation:pop .25s ease
+}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.aviso .ic{font-size:20px;line-height:1}
+
+/* ---------- modal acerto ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:50;background:rgba(4,10,16,.72);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+  animation:fade .2s ease
+}
+@media(min-width:640px){.overlay{align-items:center;padding:20px}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--bg2);border:1px solid var(--line);width:100%;max-width:640px;
+  border-radius:18px 18px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  max-height:88vh;overflow-y:auto;animation:up .28s cubic-bezier(.2,.8,.3,1)
+}
+@media(min-width:640px){.modal{border-radius:18px;padding-bottom:22px}}
+@keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+.modal h2{color:var(--verde);font-size:23px;display:flex;align-items:center;gap:10px}
+.resposta{
+  background:var(--verde-bg);border:1px solid #1e5c3c;border-radius:12px;
+  padding:12px 14px;margin:14px 0;font-weight:700;color:#c4f5d9
+}
+.bloco{margin-bottom:14px}
+.bloco b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.8px;color:var(--txt2);margin-bottom:5px}
+.macete{background:rgba(250,204,21,.08);border:1px solid rgba(250,204,21,.28);
+  border-radius:12px;padding:12px 14px;color:#f7e6a8}
+.macete b{color:var(--amarelo)}
+
+/* ---------- resultado ---------- */
+.score{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.score small{font-size:18px;color:var(--txt2);font-weight:700;letter-spacing:0}
+.rev{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}
+.rev-item{padding:10px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+.rev-item:last-child{border-bottom:0}
+.rev-item .q{font-weight:600;margin-bottom:4px}
+.rev-item .a{color:var(--verde);font-size:13.5px}
+.dica{font-size:13px;color:var(--txt2);text-align:center;margin-top:6px}
+kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;font-size:12px;font-family:inherit}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-in">
+    <div class="logo">SIMULADO <span>DETRAN</span></div>
+    <div class="top-stats hidden" id="stats">
+      <span class="pill" id="pProg">1/30</span>
+      <span class="pill ok" id="pOk">0</span>
+      <span class="pill err" id="pErr">0</span>
+    </div>
+  </div>
+  <div class="bar"><i id="barra"></i></div>
+</header>
+
+<main class="wrap">
+
+  <!-- ============ INÍCIO ============ -->
+  <section id="telaInicio">
+    <div class="card">
+      <h1>Simulado de trânsito 🚦</h1>
+      <p class="muted">As questões são sorteadas a cada rodada. Errou? Você tenta de novo até acertar — e só então aparece a explicação completa da resposta.</p>
+      <p class="muted" id="totalBanco"></p>
+    </div>
+
+    <div class="card">
+      <div class="label">Cadernos</div>
+      <div class="chips" id="fCadernos"></div>
+
+      <div class="label">Matérias</div>
+      <div class="chips" id="fTemas"></div>
+
+      <div class="label">Quantas questões</div>
+      <div class="chips" id="fQtd"></div>
+
+      <div style="height:20px"></div>
+      <button class="btn" id="btnIniciar">Começar simulado</button>
+      <div class="dica" id="dicaSel"></div>
+    </div>
+  </section>
+
+  <!-- ============ QUESTÃO ============ -->
+  <section id="telaQuestao" class="hidden">
+    <div class="card">
+      <div class="tags" id="tags"></div>
+      <div class="enunciado" id="enunciado"></div>
+      <div class="nota hidden" id="nota"></div>
+      <div class="alts" id="alts"></div>
+      <div id="avisoBox"></div>
+    </div>
+    <button class="btn sec" id="btnSair">Encerrar e ver resultado</button>
+    <div class="dica">Atalhos: <kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd> ou <kbd>1</kbd>–<kbd>4</kbd></div>
+  </section>
+
+  <!-- ============ RESULTADO ============ -->
+  <section id="telaFim" class="hidden">
+    <div class="card" style="text-align:center">
+      <div class="score" id="scoreNum"></div>
+      <p class="muted" id="scoreTxt"></p>
+      <h2 id="scoreMsg"></h2>
+      <p class="muted" id="scoreSub"></p>
+    </div>
+    <div class="card hidden" id="cardRev">
+      <h3>Questões que você errou na primeira tentativa</h3>
+      <p class="muted">Vale a pena revisar estas antes da prova:</p>
+      <div class="rev" id="revList"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn verde" id="btnRefazer">Novo sorteio</button>
+      <button class="btn sec" id="btnVoltar">Mudar filtros</button>
+    </div>
+    <div style="height:10px"></div>
+    <button class="btn sec hidden" id="btnSoErros">Treinar só o que errei</button>
+  </section>
+
+</main>
+
+<!-- ============ MODAL ACERTO ============ -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal">
+    <h2 id="mTitulo">🎉 Você acertou!</h2>
+    <div class="resposta" id="mResposta"></div>
+    <div class="bloco">
+      <b>Por que essa é a correta</b>
+      <div id="mExp"></div>
+    </div>
+    <div class="macete" id="mMacete"></div>
+    <div style="height:18px"></div>
+    <button class="btn verde" id="btnProx">Próxima questão →</button>
+    <div class="dica">Pressione <kbd>Enter</kbd> para continuar</div>
+  </div>
+</div>
+
+<!--DADOS-->
+<script>
+(function(){
+  "use strict";
+
+  const $ = id => document.getElementById(id);
+  const LETRAS = ["A","B","C","D"];
+  const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
+                    25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
+
+  /* ---------- estado ---------- */
+  let selCad = [], selTema = [], selQtd = 30;
+  let fila = [], idx = 0, acertosPrimeira = 0, errosTotais = 0, errados = [], tentouErrar = false;
+
+  /* ---------- filtros ---------- */
+  const cadernos = [...new Set(QUESTOES.map(q => q.caderno))].sort((a,b)=>a-b);
+  const temas    = [...new Set(QUESTOES.map(q => q.tema))].sort();
+
+  $("totalBanco").textContent =
+    QUESTOES.length + " questões cadastradas, todas com gabarito e explicação salvos no sistema.";
+
+  function chip(txt, sub, on, onClick){
+    const b = document.createElement("button");
+    b.className = "chip" + (on ? " on" : "");
+    b.innerHTML = txt + (sub ? "<small>"+sub+"</small>" : "");
+    b.onclick = () => { onClick(b); };
+    return b;
+  }
+
+  function montaFiltros(){
+    // cadernos
+    const cc = $("fCadernos"); cc.innerHTML = "";
+    cc.appendChild(chip("Todos","210 questões", selCad.length===0, () => {
+      selCad = []; montaFiltros();
+    }));
+    cadernos.forEach(c => {
+      cc.appendChild(chip("Caderno "+c, NOME_CAD[c], selCad.includes(c), () => {
+        selCad.includes(c) ? selCad = selCad.filter(x=>x!==c) : selCad.push(c);
+        montaFiltros();
+      }));
+    });
+    // temas
+    const tc = $("fTemas"); tc.innerHTML = "";
+    tc.appendChild(chip("Todas","", selTema.length===0, () => { selTema = []; montaFiltros(); }));
+    temas.forEach(t => {
+      const n = QUESTOES.filter(q=>q.tema===t).length;
+      tc.appendChild(chip(t, n+" questões", selTema.includes(t), () => {
+        selTema.includes(t) ? selTema = selTema.filter(x=>x!==t) : selTema.push(t);
+        montaFiltros();
+      }));
+    });
+    // quantidade
+    const qc = $("fQtd"); qc.innerHTML = "";
+    [10,20,30,40,"Todas"].forEach(q => {
+      qc.appendChild(chip(q === "Todas" ? "Todas" : q+" questões","", selQtd===q, () => {
+        selQtd = q; montaFiltros();
+      }));
+    });
+    const disp = filtrar().length;
+    $("dicaSel").textContent = disp + " questões disponíveis com os filtros escolhidos.";
+    $("btnIniciar").disabled = disp === 0;
+  }
+
+  function filtrar(){
+    let lista = QUESTOES.filter(q =>
+      (selCad.length === 0  || selCad.includes(q.caderno)) &&
+      (selTema.length === 0 || selTema.includes(q.tema))
+    );
+    // quando há mistura de cadernos, remove questões repetidas (mesmo enunciado)
+    if (selCad.length !== 1){
+      const vistos = new Set();
+      lista = lista.filter(q => {
+        const k = q.e.toLowerCase().replace(/[^a-zà-ú0-9]/g,"").slice(0,90);
+        if (vistos.has(k)) return false;
+        vistos.add(k); return true;
+      });
+    }
+    return lista;
+  }
+
+  function embaralhar(a){
+    const arr = a.slice();
+    for (let i = arr.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  /* ---------- fluxo ---------- */
+  function iniciar(lista){
+    fila = lista;
+    idx = 0; acertosPrimeira = 0; errosTotais = 0; errados = [];
+    $("telaInicio").classList.add("hidden");
+    $("telaFim").classList.add("hidden");
+    $("telaQuestao").classList.remove("hidden");
+    $("stats").classList.remove("hidden");
+    window.scrollTo(0,0);
+    mostrar();
+  }
+
+  function mostrar(){
+    const q = fila[idx];
+    tentouErrar = false;
+    $("avisoBox").innerHTML = "";
+
+    $("tags").innerHTML =
+      '<span class="tag">Caderno ' + q.caderno + '</span>' +
+      '<span class="tag">' + q.tema + '</span>' +
+      '<span class="tag">Questão ' + (idx+1) + ' de ' + fila.length + '</span>';
+
+    $("enunciado").textContent = q.e;
+
+    if (q.nota){ $("nota").textContent = "ℹ️ " + q.nota; $("nota").classList.remove("hidden"); }
+    else $("nota").classList.add("hidden");
+
+    const box = $("alts"); box.innerHTML = "";
+    q.alts.forEach((texto, i) => {
+      const b = document.createElement("button");
+      b.className = "alt";
+      b.innerHTML = '<span class="ltr">' + LETRAS[i] + '</span><span>' + texto + '</span>';
+      b.onclick = () => responder(i, b);
+      box.appendChild(b);
+    });
+
+    atualizaTopo();
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  function atualizaTopo(){
+    $("pProg").textContent = (idx+1) + "/" + fila.length;
+    $("pOk").textContent  = "✓ " + acertosPrimeira;
+    $("pErr").textContent = "✕ " + errosTotais;
+    $("barra").style.width = (idx / fila.length * 100) + "%";
+  }
+
+  function responder(i, botao){
+    const q = fila[idx];
+    if (botao.disabled) return;
+
+    if (i === q.c){
+      botao.classList.add("certa");
+      [...$("alts").children].forEach(b => b.disabled = true);
+      if (!tentouErrar) acertosPrimeira++;
+      atualizaTopo();
+      setTimeout(abrirExplicacao, 250);
+    } else {
+      errosTotais++;
+      if (!tentouErrar){ errados.push(q); tentouErrar = true; }
+      botao.classList.add("errada","shake");
+      botao.disabled = true;
+      setTimeout(() => botao.classList.remove("shake"), 400);
+      $("avisoBox").innerHTML =
+        '<div class="aviso"><span class="ic">🤔</span><span>' +
+        '<b>Ops, não é essa!</b><br>' +
+        'Leia o enunciado com calma e tente de novo — você consegue. ' +
+        'A explicação aparece assim que você acertar.</span></div>';
+      atualizaTopo();
+    }
+  }
+
+  function abrirExplicacao(){
+    const q = fila[idx];
+    $("mTitulo").textContent = tentouErrar ? "✅ Isso! Agora sim." : "🎉 Você acertou de primeira!";
+    $("mResposta").textContent = "Resposta correta: " + LETRAS[q.c] + ") " + q.alts[q.c];
+    $("mExp").textContent = q.exp;
+    $("mMacete").innerHTML = "<b>💡 Macete para lembrar:</b> " + q.mac;
+    $("btnProx").textContent = (idx === fila.length - 1) ? "Ver meu resultado →" : "Próxima questão →";
+    $("overlay").classList.remove("hidden");
+    $("overlay").querySelector(".modal").scrollTop = 0;
+  }
+
+  function proxima(){
+    $("overlay").classList.add("hidden");
+    if (idx === fila.length - 1){ finalizar(); return; }
+    idx++;
+    mostrar();
+  }
+
+  function finalizar(){
+    $("telaQuestao").classList.add("hidden");
+    $("overlay").classList.add("hidden");
+    $("telaFim").classList.remove("hidden");
+    $("stats").classList.add("hidden");
+    $("barra").style.width = "100%";
+
+    const feitas = Math.min(idx + 1, fila.length);
+    const pct = Math.round(acertosPrimeira / feitas * 100);
+    $("scoreNum").innerHTML = pct + "<small>%</small>";
+    $("scoreTxt").textContent = acertosPrimeira + " de " + feitas + " questões acertadas na primeira tentativa · " + errosTotais + " erro(s) no total";
+
+    let msg, sub;
+    if (pct >= 90){ msg = "🏆 Excelente!"; sub = "Nesse ritmo a prova do DETRAN é passeio."; }
+    else if (pct >= 70){ msg = "✅ Aprovado!"; sub = "Acima dos 70% exigidos na prova. Revise os erros e mantenha o ritmo."; }
+    else if (pct >= 50){ msg = "⚠️ Quase lá"; sub = "A prova exige 70% de acerto. Refaça o simulado focando nas matérias que caíram mais."; }
+    else { msg = "📚 Hora de estudar"; sub = "Releia as explicações com calma e refaça o simulado. Toda questão errada aqui é uma a menos na prova."; }
+    $("scoreMsg").textContent = msg;
+    $("scoreSub").textContent = sub;
+
+    if (errados.length){
+      $("cardRev").classList.remove("hidden");
+      $("btnSoErros").classList.remove("hidden");
+      $("revList").innerHTML = errados.map(q =>
+        '<div class="rev-item"><div class="q">' + q.e + '</div>' +
+        '<div class="a">✔ ' + LETRAS[q.c] + ") " + q.alts[q.c] + '</div></div>'
+      ).join("");
+    } else {
+      $("cardRev").classList.add("hidden");
+      $("btnSoErros").classList.add("hidden");
+    }
+    window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  /* ---------- eventos ---------- */
+  $("btnIniciar").onclick = () => {
+    const disp = embaralhar(filtrar());
+    const n = (selQtd === "Todas") ? disp.length : Math.min(selQtd, disp.length);
+    iniciar(disp.slice(0, n));
+  };
+  $("btnProx").onclick = proxima;
+  $("btnSair").onclick = finalizar;
+  $("btnRefazer").onclick = () => $("btnIniciar").click();
+  $("btnVoltar").onclick = () => {
+    $("telaFim").classList.add("hidden");
+    $("telaInicio").classList.remove("hidden");
+    $("barra").style.width = "0";
+    window.scrollTo(0,0);
+  };
+  $("btnSoErros").onclick = () => iniciar(embaralhar(errados));
+
+  document.addEventListener("keydown", e => {
+    if (!$("overlay").classList.contains("hidden")){
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); proxima(); }
+      return;
+    }
+    if ($("telaQuestao").classList.contains("hidden")) return;
+    const k = e.key.toUpperCase();
+    let i = LETRAS.indexOf(k);
+    if (i < 0 && "1234".includes(k)) i = Number(k) - 1;
+    if (i >= 0){
+      const b = $("alts").children[i];
+      if (b && !b.disabled) b.click();
+    }
+  });
+
+  montaFiltros();
+})();
+</script>
+</body>
+</html>
