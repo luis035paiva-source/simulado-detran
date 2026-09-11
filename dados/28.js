@@ -114,11 +114,8 @@ Q(28, `Direção Defensiva`,
 `O álcool é depressor do sistema nervoso central: reduz o campo visual (efeito túnel), a percepção de profundidade e a velocidade de reação. Nada do que ele provoca "melhora" a condução.`,
 `Álcool nunca melhora nada: reduz visão, reflexo e raciocínio.`);
 
-Q(28, `Legislação`,
-`Para o licenciamento de um veículo é obrigatório:`,
-[`Pagar o IPVA.`,`Pagar o DPVAT.`,`Passar por uma inspeção veicular.`,`Todas acima estão corretas.`],3,
-`O licenciamento anual exige a quitação dos débitos do veículo – IPVA, seguro obrigatório e multas – e a aprovação em inspeção veicular quando esta for exigida pelo órgão executivo de trânsito.`,
-`Licenciar = quitar tudo (IPVA, seguro, multas) e passar na vistoria.`);
+/* Questão 19 do caderno 28 (licenciamento condicionado ao pagamento do DPVAT)
+   foi removida: o DPVAT foi extinto e não é mais requisito do licenciamento. */
 
 Q(28, `Legislação`,
 `Não é considerado crime de trânsito:`,
@@ -170,9 +167,10 @@ Q(28, `Legislação`,
 
 Q(28, `Legislação`,
 `Não sendo imediata a identificação do infrator, o proprietário terá qual prazo para apresentá-lo?`,
-[`30 dias.`,`45 dias.`,`15 dias.`,`48 horas.`],2,
-`O art. 257, § 7º, do CTB dá ao proprietário o prazo de 15 dias, contados da notificação da autuação, para identificar o real condutor infrator. Se não identificar, o proprietário responde pela infração.`,
-`15 dias para apontar quem dirigia – senão a multa e os pontos são seus.`);
+[`30 dias.`,`45 dias.`,`15 dias.`,`48 horas.`],0,
+`O art. 257, § 7º, do CTB dá ao principal condutor ou ao proprietário o prazo de 30 dias, contados da notificação da autuação, para identificar o real infrator. Passado o prazo sem indicação, a multa e os pontos ficam com ele.`,
+`São 30 dias para apontar quem dirigia – senão a multa e os pontos são seus.`,
+`O caderno impresso traz 15 dias, que era o prazo antigo. A Lei 14.071/2021 aumentou para 30 dias, e é essa a resposta certa hoje.`);
 
 Q(28, `Sinalização`,
 `O procedimento correto do condutor de veículo diante da sinalização semafórica ilustrada na imagem é:`,
