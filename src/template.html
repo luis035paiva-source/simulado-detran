@@ -313,7 +313,9 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
 
   /* ---------- estado ---------- */
   let selCad = [], selTema = [], selQtd = 30, selEmb = false;
-  let fila = [], idx = 0, acertosPrimeira = 0, errosTotais = 0, errados = [], tentouErrar = false;
+  // acertosPrimeira = questões acertadas SEM nenhuma tentativa errada
+  // errados         = questões erradas (cada questão conta no máximo 1 erro)
+  let fila = [], idx = 0, acertosPrimeira = 0, errados = [], tentouErrar = false;
   const APROV = 0.7;   // 70% de acerto = 21 questões numa prova de 30
 
   /* ---------- filtros ---------- */
@@ -422,7 +424,7 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   /* ---------- fluxo ---------- */
   function iniciar(lista){
     fila = lista;
-    idx = 0; acertosPrimeira = 0; errosTotais = 0; errados = [];
+    idx = 0; acertosPrimeira = 0; errados = [];
     $("telaInicio").classList.add("hidden");
     $("telaFim").classList.add("hidden");
     $("telaQuestao").classList.remove("hidden");
@@ -468,7 +470,7 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   function atualizaTopo(){
     $("pProg").textContent = (idx+1) + "/" + fila.length;
     $("pOk").textContent  = "✓ " + acertosPrimeira;
-    $("pErr").textContent = "✕ " + errosTotais;
+    $("pErr").textContent = "✕ " + errados.length;
     $("barra").style.width = (idx / fila.length * 100) + "%";
   }
 
@@ -483,16 +485,20 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
       atualizaTopo();
       setTimeout(abrirExplicacao, 250);
     } else {
-      errosTotais++;
-      if (!tentouErrar){ errados.push(q); tentouErrar = true; }
+      const primeiroErro = !tentouErrar;
+      if (primeiroErro){ errados.push(q); tentouErrar = true; }   // 1 erro por questão
       botao.classList.add("errada","shake");
       botao.disabled = true;
       setTimeout(() => botao.classList.remove("shake"), 400);
-      $("avisoBox").innerHTML =
-        '<div class="aviso"><span class="ic">🤔</span><span>' +
-        '<b>Ops, não é essa!</b><br>' +
-        'Leia o enunciado com calma e tente de novo — você consegue. ' +
-        'A explicação aparece assim que você acertar.</span></div>';
+      $("avisoBox").innerHTML = primeiroErro
+        ? '<div class="aviso"><span class="ic">🤔</span><span>' +
+          '<b>Ops, não é essa!</b><br>' +
+          'Esta questão já entrou como erro — tentar de novo agora não piora a nota. ' +
+          'Leia o enunciado com calma: a explicação aparece assim que você acertar.</span></div>'
+        : '<div class="aviso"><span class="ic">🔁</span><span>' +
+          '<b>Essa também não.</b><br>' +
+          'A questão continua contando como <b>um</b> erro só. Sobrou pouca opção: pense no que faz sentido ' +
+          'para a segurança e marque de novo.</span></div>';
       atualizaTopo();
     }
   }
@@ -542,7 +548,10 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
           : "Prova de " + feitas + " questões: faltaram " + faltou + " acerto(s) para os 70% exigidos (na prova oficial são 21 de 30).");
 
     $("scoreNum").innerHTML = pct + "<small>%</small>";
-    $("scoreTxt").textContent = acertosPrimeira + " de " + feitas + " questões acertadas na primeira tentativa · " + errosTotais + " erro(s) no total";
+    $("scoreTxt").textContent =
+      "✔ " + acertosPrimeira + " certa(s) de primeira · ✘ " + errados.length +
+      " errada(s) · " + feitas + " questões respondidas. Questão que você só acertou depois de errar " +
+      "não conta como acerto, e cada questão errada conta um erro só.";
 
     let msg, sub;
     if (pct >= 90){ msg = "🏆 Excelente!"; sub = "Nesse ritmo a prova do DETRAN é passeio."; }

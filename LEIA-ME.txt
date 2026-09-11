@@ -20,6 +20,9 @@ Como funciona
   tentar de novo, sem entregar a resposta.
 - Marcou a certa: abre a explicação completa (o porquê da resposta e um
   macete para memorizar).
+- Contagem: cada questão errada vale UM erro, não importa quantas
+  alternativas erradas você marque nela. E questão que você só acertou
+  depois de errar não entra como acerto - conta só o acerto de primeira.
 - No fim aparece o veredito APROVADO ou REPROVADO: o critério é o do
   DETRAN, 21 acertos em 30 questões (70%). Em rodadas com outra
   quantidade de questões o mínimo é recalculado pelos mesmos 70%.
