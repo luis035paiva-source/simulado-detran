@@ -29,15 +29,20 @@ Como funciona
 - Também aparece o percentual de acerto de primeira tentativa e a lista
   das questões que você errou, com um botão para treinar só elas.
 
-Conteúdo: 210 questões (cadernos 19, 20, 21, 25, 26, 27 e 28), todas com
-gabarito e explicação salvos dentro do próprio arquivo.
+Conteúdo: 295 questões, todas com gabarito e explicação salvos dentro do
+próprio arquivo:
+- Cadernos 19, 20, 21, 25, 26, 27 e 28 (210 questões);
+- Provas 01, 02 e 03 do caderno "Provas Simuladas" (85 questões sobre
+  Sistema Nacional de Trânsito, Processo de Habilitação e Veículos),
+  com as respostas conferidas contra o gabarito oficial do caderno.
 
 Para editar/adicionar questões
 ------------------------------
 - As 13 questões que tinham imagem (placas, semáforo, gesto do agente e
   cruzamento) têm a ilustração desenhada em SVG dentro do site, em
   dados/imagens.js. Não dependem de internet.
-- As questões ficam em dados/19.js, dados/20.js ... dados/28.js
+- As questões ficam em dados/19.js ... dados/28.js e em dados/37-p01.js,
+  37-p02.js e 37-p03.js
   (formato: enunciado, alternativas, índice da correta - 0=A, 1=B, 2=C,
   3=D -, explicação e macete).
 - O layout do site fica em src/template.html

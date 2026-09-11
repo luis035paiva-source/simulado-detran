@@ -300,8 +300,11 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
 
   const $ = id => document.getElementById(id);
   const LETRAS = ["A","B","C","D"];
-  const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
+  const NOME_CAD = {1:"Sistema Nacional de Trânsito",2:"Processo de Habilitação",3:"Veículos e documentos",
+                    19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
                     25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
+  // provas novas usam números baixos e aparecem como "Prova 01"; os cadernos antigos, como "Caderno 19"
+  const rotulo = c => (c < 10 ? "Prova " + String(c).padStart(2,"0") : "Caderno " + c);
   const LEGENDAS = {
     "A-17":"Placa A-17", "A-26a":"Placa A-26a", "A-13b":"Placa A-13b", "A-33b":"Placa A-33b",
     "R-4b":"Placa R-4b", "R-20":"Placa R-20", "R-14":"Placa R-14", "R-18":"Placa R-18",
@@ -336,11 +339,11 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   function montaFiltros(){
     // cadernos
     const cc = $("fCadernos"); cc.innerHTML = "";
-    cc.appendChild(chip("Todos","210 questões", selCad.length===0, () => {
+    cc.appendChild(chip("Todos", QUESTOES.length+" questões", selCad.length===0, () => {
       selCad = []; montaFiltros();
     }));
     cadernos.forEach(c => {
-      cc.appendChild(chip("Caderno "+c, NOME_CAD[c], selCad.includes(c), () => {
+      cc.appendChild(chip(rotulo(c), NOME_CAD[c], selCad.includes(c), () => {
         selCad.includes(c) ? selCad = selCad.filter(x=>x!==c) : selCad.push(c);
         montaFiltros();
       }));
@@ -439,7 +442,7 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
     $("avisoBox").innerHTML = "";
 
     $("tags").innerHTML =
-      '<span class="tag">Caderno ' + q.caderno + '</span>' +
+      '<span class="tag">' + rotulo(q.caderno) + '</span>' +
       '<span class="tag">' + q.tema + '</span>' +
       '<span class="tag">Questão ' + (idx+1) + ' de ' + fila.length + '</span>';
 
