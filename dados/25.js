@@ -77,7 +77,8 @@ Q(25, `Sinalização`,
 [`Uma pista escorregadia.`,`Um trecho de via perigosa pela irregularidade de sua superfície.`,`Um trecho com lombada.`,`Uma depressão.`],1,
 `A placa A-17 é a "Pista irregular": adverte que adiante há um trecho de via em más condições de conservação (buracos, ondulações, remendos), exigindo redução de velocidade. Pista escorregadia é a A-16 e saliência/lombada é a A-18.`,
 `A-17 = pista irregular: o asfalto está ruim, reduza a velocidade!`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-17`);
 
 Q(25, `Direção Defensiva`,
 `Para evitar colisões nos cruzamentos é fundamental:`,
@@ -102,7 +103,8 @@ Q(25, `Sinalização`,
 [`Ordem de seguir para os veículos aos quais a luz é dirigida.`,`Ordem de parada para veículos aos quais a luz é dirigida.`,`Ordem de atenção.`,`Ordem de diminuição da velocidade.`],1,
 `Nos gestos noturnos previstos no CTB, a lanterna com luz vermelha ou a luz apontada diretamente para o veículo significa ORDEM DE PARADA para o condutor a quem a luz é dirigida. As ordens do agente prevalecem sobre qualquer outra sinalização.`,
 `Luz apontada na sua direção = PARE. E ordem de agente vale mais que semáforo e placa.`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`AGENTE-LANTERNA`);
 
 Q(25, `Cidadania`,
 `Cidadania é:`,
@@ -151,7 +153,8 @@ Q(25, `Sinalização`,
 [`Peso bruto total limitado.`,`Largura até o limite indicado na placa.`,`Peso máximo por eixo.`,`Nenhuma das anteriores.`],0,
 `Na série de regulamentação: R-14 é "Peso bruto total máximo permitido", R-15 é altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo.`,
 `R-14 = peso bruto TOTAL do veículo carregado. R-17 é o peso por EIXO.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-14`);
 
 Q(25, `Direção Defensiva`,
 `Nas retas, o motorista deve manter suas mãos no volante na posição:`,

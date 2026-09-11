@@ -88,6 +88,13 @@ header.top{
   padding:4px 9px;border-radius:6px;background:var(--card2);color:var(--txt2);border:1px solid var(--line)}
 .enunciado{font-size:18px;font-weight:600;margin-bottom:16px}
 @media(min-width:640px){.enunciado{font-size:19px}}
+.figura{margin:0 0 16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.fig-img{
+  background:#f2f6fa;border:1px solid var(--line);border-radius:14px;
+  padding:14px;width:100%;max-width:230px;display:flex;justify-content:center
+}
+.fig-img svg{width:100%;height:auto;max-height:200px;display:block}
+.figura figcaption{font-size:12.5px;color:var(--txt2);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 .nota{font-size:13px;color:var(--amarelo);background:rgba(250,204,21,.08);
   border:1px solid rgba(250,204,21,.28);border-radius:10px;padding:9px 12px;margin-bottom:14px}
 
@@ -230,6 +237,10 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
     <div class="card">
       <div class="tags" id="tags"></div>
       <div class="enunciado" id="enunciado"></div>
+      <figure class="figura hidden" id="figura">
+        <div class="fig-img" id="figImg"></div>
+        <figcaption id="figCap"></figcaption>
+      </figure>
       <div class="nota hidden" id="nota"></div>
       <div class="alts" id="alts"></div>
       <div id="avisoBox"></div>
@@ -291,6 +302,14 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
   const LETRAS = ["A","B","C","D"];
   const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
                     25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
+  const LEGENDAS = {
+    "A-17":"Placa A-17", "A-26a":"Placa A-26a", "A-13b":"Placa A-13b", "A-33b":"Placa A-33b",
+    "R-4b":"Placa R-4b", "R-20":"Placa R-20", "R-14":"Placa R-14", "R-18":"Placa R-18",
+    "SAU-18":"Placa SAU-18", "TAR-03":"Placa TAR-03",
+    "SEMAFORO-AMARELO":"Sinalização semafórica",
+    "AGENTE-LANTERNA":"Gesto do agente à noite",
+    "CRUZAMENTO-1-2":"Cruzamento sem sinalização"
+  };
 
   /* ---------- estado ---------- */
   let selCad = [], selTema = [], selQtd = 30, selEmb = false;
@@ -423,6 +442,12 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
       '<span class="tag">Questão ' + (idx+1) + ' de ' + fila.length + '</span>';
 
     $("enunciado").textContent = q.e;
+
+    if (q.img && IMAGENS[q.img]){
+      $("figImg").innerHTML = IMAGENS[q.img];
+      $("figCap").textContent = LEGENDAS[q.img] || q.img;
+      $("figura").classList.remove("hidden");
+    } else $("figura").classList.add("hidden");
 
     if (q.nota){ $("nota").textContent = "ℹ️ " + q.nota; $("nota").classList.remove("hidden"); }
     else $("nota").classList.add("hidden");

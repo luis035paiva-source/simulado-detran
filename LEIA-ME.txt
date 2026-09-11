@@ -31,6 +31,9 @@ gabarito e explicação salvos dentro do próprio arquivo.
 
 Para editar/adicionar questões
 ------------------------------
+- As 13 questões que tinham imagem (placas, semáforo, gesto do agente e
+  cruzamento) têm a ilustração desenhada em SVG dentro do site, em
+  dados/imagens.js. Não dependem de internet.
 - As questões ficam em dados/19.js, dados/20.js ... dados/28.js
   (formato: enunciado, alternativas, índice da correta - 0=A, 1=B, 2=C,
   3=D -, explicação e macete).

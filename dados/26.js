@@ -71,7 +71,8 @@ Q(26, `Sinalização`,
 [`Uma passagem sinalizada de escolares.`,`Travessia de animais.`,`Proibido passagem de pedestres.`,`Passagem obrigatória para veículos escolares.`],0,
 `Na série de advertência, A-33a é "Passagem sinalizada de pedestres" e A-33b é "Passagem sinalizada de escolares", alertando para a travessia de crianças (normalmente perto de escolas). Placa de advertência nunca proíbe nem obriga: apenas adverte.`,
 `A-33b: crianças atravessando adiante – reduza e redobre a atenção.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-33b`);
 
 Q(26, `Direção Defensiva`,
 `Tempo de reação é aquele que transcorre entre:`,
@@ -84,7 +85,8 @@ Q(26, `Legislação`,
 [`Ao veículo que vier pela esquerda.`,`Ao veículo que seguir em frente.`,`Ao veículo 1, que está à direita do 2.`,`Ao veículo 2, porque o veículo 1 vai virar à esquerda.`],2,
 `Em cruzamento não sinalizado, a regra do CTB (art. 29, III) dá a preferência a quem vem pela DIREITA. Só existem duas exceções: rotatória (preferência de quem já está circulando) e via preferencial sinalizada.`,
 `Cruzamento sem sinalização: a preferência é de quem vem pela DIREITA.`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`CRUZAMENTO-1-2`);
 
 Q(26, `Meio Ambiente`,
 `Marque a alternativa incorreta. A emissão de gases poluentes:`,
@@ -127,7 +129,8 @@ Q(26, `Sinalização`,
 [`Proibido virar à esquerda.`,`Proibido seguir em frente.`,`Curva acentuada à direita.`,`Proibido virar à direita.`],3,
 `Na série de regulamentação, R-4a é "Proibido virar à esquerda" e R-4b é "Proibido virar à direita". Placas de regulamentação são circulares, com fundo branco, borda e tarja vermelhas.`,
 `R-4a = esquerda proibida; R-4b = direita proibida (a "b" vem depois, igual a direita).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-4b`);
 
 Q(26, `Direção Defensiva`,
 `Não constitui fundamento da direção defensiva:`,

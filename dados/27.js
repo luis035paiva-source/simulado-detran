@@ -17,7 +17,8 @@ Q(27, `Sinalização`,
 [`Uma área de estacionamento privado.`,`Uma praça de pedágio.`,`Um Drive Thru.`,`Um posto para abastecer seu veículo à distância indicada na placa.`],1,
 `As placas SAU (Serviços Auxiliares) informam serviços úteis ao usuário da via – hospital, posto de combustível, telefone, restaurante, pedágio, etc. A SAU-18 é a que indica a praça de pedágio adiante.`,
 `SAU = Serviço Auxiliar: o que existe de útil na via (posto, hospital, pedágio...).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Se a imagem do seu caderno mostrar uma bomba de combustível, a resposta correta é a alternativa D.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`SAU-18`);
 
 Q(27, `Primeiros Socorros`,
 `Não constitui procedimento correto com uma vítima em estado de choque:`,
@@ -78,7 +79,8 @@ Q(27, `Sinalização`,
 [`Área hospitalar.`,`Proibido ultrapassar.`,`Passagem obrigatória.`,`Proibido acionar buzina ou sinal sonoro.`],3,
 `A R-20 é "Proibido acionar buzina ou sinal sonoro", geralmente usada perto de hospitais e escolas. "Proibido ultrapassar" é a R-7.`,
 `R-20 = silêncio! Nada de buzina neste trecho.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-20`);
 
 Q(27, `Direção Defensiva`,
 `O condutor que, na direção do veículo, evita situações de acidentes ao trafegar com as devidas margens de segurança, está praticando uma direção defensiva:`,
@@ -163,7 +165,8 @@ Q(27, `Sinalização`,
 [`Passagem obrigatória.`,`Sentido único.`,`Sentido de circulação de via.`,`Siga em frente.`],1,
 `Na série de advertência, A-26a é "Sentido único" e A-26b é "Sentido duplo". São placas de advertência (losango amarelo) que informam como é a circulação da via adiante.`,
 `A-26a = sentido único; A-26b = sentido duplo.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-26a`);
 
 Q(27, `Direção Defensiva`,
 `Manter uma distância do veículo da frente é uma:`,

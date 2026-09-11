@@ -88,6 +88,13 @@ header.top{
   padding:4px 9px;border-radius:6px;background:var(--card2);color:var(--txt2);border:1px solid var(--line)}
 .enunciado{font-size:18px;font-weight:600;margin-bottom:16px}
 @media(min-width:640px){.enunciado{font-size:19px}}
+.figura{margin:0 0 16px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.fig-img{
+  background:#f2f6fa;border:1px solid var(--line);border-radius:14px;
+  padding:14px;width:100%;max-width:230px;display:flex;justify-content:center
+}
+.fig-img svg{width:100%;height:auto;max-height:200px;display:block}
+.figura figcaption{font-size:12.5px;color:var(--txt2);font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 .nota{font-size:13px;color:var(--amarelo);background:rgba(250,204,21,.08);
   border:1px solid rgba(250,204,21,.28);border-radius:10px;padding:9px 12px;margin-bottom:14px}
 
@@ -230,6 +237,10 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
     <div class="card">
       <div class="tags" id="tags"></div>
       <div class="enunciado" id="enunciado"></div>
+      <figure class="figura hidden" id="figura">
+        <div class="fig-img" id="figImg"></div>
+        <figcaption id="figCap"></figcaption>
+      </figure>
       <div class="nota hidden" id="nota"></div>
       <div class="alts" id="alts"></div>
       <div id="avisoBox"></div>
@@ -290,13 +301,174 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
    no CTB (Código de Trânsito Brasileiro) e no conteúdo programático do DETRAN.
 
    c = índice da alternativa correta (0=A, 1=B, 2=C, 3=D)
-   nota = observação exibida junto da questão (ex.: questão que dependia de imagem) */
+   nota = observação exibida junto da questão
+   img  = chave de uma ilustração de dados/imagens.js (placa, semáforo etc.) */
 
 const QUESTOES = [];
 
-function Q(caderno, tema, e, alts, c, exp, mac, nota) {
-  QUESTOES.push({ caderno, tema, e, alts, c, exp, mac, nota });
+function Q(caderno, tema, e, alts, c, exp, mac, nota, img) {
+  QUESTOES.push({ caderno, tema, e, alts, c, exp, mac, nota, img });
 }
+
+
+/* Ilustrações das questões, desenhadas em SVG (não dependem de internet).
+   Placas conforme o padrão do CONTRAN: advertência = losango amarelo,
+   regulamentação = círculo branco com tarja vermelha, serviços auxiliares =
+   retângulo azul, atrativos turísticos = retângulo marrom. */
+
+const IMAGENS = {
+
+/* ---------- ADVERTÊNCIA (losango amarelo) ---------- */
+
+"A-17": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa A-17, pista irregular">
+  <polygon points="60,4 116,60 60,116 4,60" fill="#F5C518" stroke="#101010" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M24 74c8 0 8-18 17-18s9 18 18 18 9-18 18-18 8 18 17 18"
+        fill="none" stroke="#101010" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M36 88h48" stroke="#101010" stroke-width="6" stroke-linecap="round" opacity=".5"/>
+</svg>`,
+
+"A-26a": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa A-26a, sentido único">
+  <polygon points="60,4 116,60 60,116 4,60" fill="#F5C518" stroke="#101010" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M30 60h44" stroke="#101010" stroke-width="10" stroke-linecap="butt"/>
+  <polygon points="92,60 68,44 68,76" fill="#101010"/>
+</svg>`,
+
+"A-13b": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa A-13b, confluência à direita">
+  <polygon points="60,4 116,60 60,116 4,60" fill="#F5C518" stroke="#101010" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M54 104V50" stroke="#101010" stroke-width="11" stroke-linecap="butt"/>
+  <polygon points="54,24 40,50 68,50" fill="#101010"/>
+  <path d="M86 102c0-24-12-34-30-38" fill="none" stroke="#101010" stroke-width="10" stroke-linecap="round"/>
+</svg>`,
+
+"A-33b": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa A-33b, passagem sinalizada de escolares">
+  <polygon points="60,4 116,60 60,116 4,60" fill="#F5C518" stroke="#101010" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#101010">
+    <!-- criança maior -->
+    <circle cx="72" cy="40" r="8"/>
+    <path d="M72 50c7 0 11 5 11 11l2 14h-7l-2-10-1 27h-6l-2-18-3 18h-6l2-31c0-7 5-11 12-11z"/>
+    <!-- criança menor -->
+    <circle cx="45" cy="52" r="6.5"/>
+    <path d="M45 60c6 0 9 4 9 9l1 11h-5l-2-8-1 22h-5l-1-14-2 14h-5l2-25c0-5 4-9 9-9z"/>
+  </g>
+  <path d="M44 96h32" stroke="#101010" stroke-width="6" stroke-linecap="round" opacity=".5"/>
+</svg>`,
+
+/* ---------- REGULAMENTAÇÃO (círculo com tarja vermelha) ---------- */
+
+"R-4b": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa R-4b, proibido virar à direita">
+  <circle cx="60" cy="60" r="54" fill="#fff" stroke="#D5232C" stroke-width="11"/>
+  <path d="M44 96V66c0-9 7-16 16-16h14" fill="none" stroke="#101010" stroke-width="11" stroke-linecap="butt"/>
+  <polygon points="90,50 66,36 66,64" fill="#101010"/>
+  <path d="M24 96 96 24" stroke="#D5232C" stroke-width="11" stroke-linecap="round"/>
+</svg>`,
+
+"R-20": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa R-20, proibido acionar buzina">
+  <circle cx="60" cy="60" r="54" fill="#fff" stroke="#D5232C" stroke-width="11"/>
+  <rect x="26" y="52" width="16" height="16" rx="5" fill="#101010"/>
+  <path d="M42 52l28-16v48L42 68z" fill="#101010"/>
+  <path d="M80 44c7 9 7 23 0 32" fill="none" stroke="#101010" stroke-width="6" stroke-linecap="round"/>
+  <path d="M92 34c12 15 12 37 0 52" fill="none" stroke="#101010" stroke-width="6" stroke-linecap="round"/>
+  <path d="M24 96 96 24" stroke="#D5232C" stroke-width="11" stroke-linecap="round"/>
+</svg>`,
+
+"R-14": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa R-14, peso bruto total máximo permitido 8 toneladas">
+  <circle cx="60" cy="60" r="54" fill="#fff" stroke="#D5232C" stroke-width="11"/>
+  <text x="60" y="76" text-anchor="middle" font-family="Arial,Helvetica,sans-serif"
+        font-size="46" font-weight="700" fill="#101010">8t</text>
+</svg>`,
+
+"R-18": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa R-18, comprimento máximo permitido 10 metros">
+  <circle cx="60" cy="60" r="54" fill="#fff" stroke="#D5232C" stroke-width="11"/>
+  <path d="M34 44h52" stroke="#101010" stroke-width="5"/>
+  <polygon points="28,44 40,38 40,50" fill="#101010"/>
+  <polygon points="92,44 80,38 80,50" fill="#101010"/>
+  <text x="60" y="88" text-anchor="middle" font-family="Arial,Helvetica,sans-serif"
+        font-size="32" font-weight="700" fill="#101010">10m</text>
+</svg>`,
+
+/* ---------- SERVIÇOS AUXILIARES / TURÍSTICA ---------- */
+
+"SAU-18": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa SAU-18, pedágio">
+  <rect x="6" y="6" width="108" height="108" rx="6" fill="#0B4C9B" stroke="#fff" stroke-width="5"/>
+  <g fill="#fff">
+    <rect x="20" y="44" width="80" height="8" rx="2"/>
+    <rect x="26" y="52" width="20" height="34" rx="2"/>
+    <rect x="74" y="52" width="20" height="34" rx="2"/>
+    <rect x="31" y="58" width="10" height="10" fill="#0B4C9B"/>
+    <rect x="79" y="58" width="10" height="10" fill="#0B4C9B"/>
+    <path d="M50 80h20l4 6v6H46v-6z"/>
+    <rect x="50" y="72" width="16" height="8" rx="3"/>
+  </g>
+  <path d="M20 100h80" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M46 70h34" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".9"/>
+</svg>`,
+
+"TAR-03": `<svg viewBox="0 0 120 120" role="img" aria-label="Placa TAR-03, parque urbano">
+  <rect x="6" y="6" width="108" height="108" rx="6" fill="#6B4226" stroke="#fff" stroke-width="5"/>
+  <g fill="#fff">
+    <circle cx="46" cy="44" r="20"/>
+    <rect x="42" y="60" width="8" height="28" rx="2"/>
+    <rect x="62" y="74" width="34" height="6" rx="2"/>
+    <rect x="62" y="84" width="34" height="5" rx="2"/>
+    <rect x="63" y="74" width="5" height="20" rx="2"/>
+    <rect x="90" y="74" width="5" height="20" rx="2"/>
+  </g>
+  <path d="M18 98h84" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+</svg>`,
+
+/* ---------- SITUAÇÕES ---------- */
+
+"SEMAFORO-AMARELO": `<svg viewBox="0 0 120 120" role="img" aria-label="Semáforo com a luz amarela acesa">
+  <rect x="36" y="8" width="48" height="104" rx="10" fill="#20303f" stroke="#0b1520" stroke-width="4"/>
+  <circle cx="60" cy="34" r="14" fill="#3a1f1f"/>
+  <circle cx="60" cy="60" r="14" fill="#FFC400"/>
+  <circle cx="60" cy="86" r="14" fill="#1d3327"/>
+  <g stroke="#FFC400" stroke-width="4" stroke-linecap="round" opacity=".85">
+    <path d="M84 60h12"/><path d="M24 60h12"/><path d="M78 43l9-8"/><path d="M33 85l9-8"/>
+  </g>
+</svg>`,
+
+"AGENTE-LANTERNA": `<svg viewBox="0 0 160 120" role="img" aria-label="Agente de trânsito à noite apontando a luz da lanterna para o veículo">
+  <rect x="0" y="0" width="160" height="120" rx="8" fill="#101c28"/>
+  <path d="M0 96h160" stroke="#2c3d4f" stroke-width="8"/>
+  <!-- feixe de luz apontado para quem olha a placa -->
+  <path d="M96 56 158 26v62z" fill="#FFC400" opacity=".28"/>
+  <g fill="#e8f1fa">
+    <circle cx="60" cy="30" r="11"/>
+    <path d="M60 43c11 0 18 7 18 17v14H42V60c0-10 7-17 18-17z"/>
+    <path d="M50 74h20l5 22h-9l-6-14-6 14h-9z"/>
+    <path d="M74 58l22-6 3 9-22 6z"/>
+  </g>
+  <rect x="94" y="48" width="14" height="16" rx="3" fill="#FFC400"/>
+  <text x="12" y="24" font-family="Arial,Helvetica,sans-serif" font-size="13" fill="#9fb2c4">à noite</text>
+</svg>`,
+
+"CRUZAMENTO-1-2": `<svg viewBox="0 0 160 140" role="img" aria-label="Cruzamento sem sinalização: o veículo 1 vem pela direita do veículo 2">
+  <rect x="0" y="0" width="160" height="140" rx="8" fill="#1b2735"/>
+  <rect x="0" y="46" width="160" height="48" fill="#33475d"/>
+  <rect x="56" y="0" width="48" height="140" fill="#33475d"/>
+  <g stroke="#e8f1fa" stroke-width="3" stroke-dasharray="9 9" opacity=".7">
+    <path d="M0 70h56"/><path d="M104 70h56"/><path d="M80 0v46"/><path d="M80 94v46"/>
+  </g>
+  <!-- veículo 1: vem pela direita -->
+  <g transform="translate(122,58)">
+    <rect x="0" y="0" width="30" height="22" rx="5" fill="#3d9bff"/>
+    <text x="15" y="16" text-anchor="middle" font-family="Arial,Helvetica,sans-serif"
+          font-size="13" font-weight="700" fill="#04101d">1</text>
+  </g>
+  <path d="M120 69h-10" stroke="#3d9bff" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="104,69 114,64 114,74" fill="#3d9bff"/>
+  <!-- veículo 2: vem de baixo -->
+  <g transform="translate(66,104)">
+    <rect x="0" y="0" width="22" height="30" rx="5" fill="#22c55e"/>
+    <text x="11" y="20" text-anchor="middle" font-family="Arial,Helvetica,sans-serif"
+          font-size="13" font-weight="700" fill="#04140b">2</text>
+  </g>
+  <path d="M77 102v-8" stroke="#22c55e" stroke-width="4" stroke-linecap="round"/>
+  <polygon points="77,88 72,98 82,98" fill="#22c55e"/>
+</svg>`
+
+};
 
 
 /* Caderno 19 – Direção Defensiva */
@@ -927,7 +1099,8 @@ Q(25, `Sinalização`,
 [`Uma pista escorregadia.`,`Um trecho de via perigosa pela irregularidade de sua superfície.`,`Um trecho com lombada.`,`Uma depressão.`],1,
 `A placa A-17 é a "Pista irregular": adverte que adiante há um trecho de via em más condições de conservação (buracos, ondulações, remendos), exigindo redução de velocidade. Pista escorregadia é a A-16 e saliência/lombada é a A-18.`,
 `A-17 = pista irregular: o asfalto está ruim, reduza a velocidade!`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-17`);
 
 Q(25, `Direção Defensiva`,
 `Para evitar colisões nos cruzamentos é fundamental:`,
@@ -952,7 +1125,8 @@ Q(25, `Sinalização`,
 [`Ordem de seguir para os veículos aos quais a luz é dirigida.`,`Ordem de parada para veículos aos quais a luz é dirigida.`,`Ordem de atenção.`,`Ordem de diminuição da velocidade.`],1,
 `Nos gestos noturnos previstos no CTB, a lanterna com luz vermelha ou a luz apontada diretamente para o veículo significa ORDEM DE PARADA para o condutor a quem a luz é dirigida. As ordens do agente prevalecem sobre qualquer outra sinalização.`,
 `Luz apontada na sua direção = PARE. E ordem de agente vale mais que semáforo e placa.`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`AGENTE-LANTERNA`);
 
 Q(25, `Cidadania`,
 `Cidadania é:`,
@@ -1001,7 +1175,8 @@ Q(25, `Sinalização`,
 [`Peso bruto total limitado.`,`Largura até o limite indicado na placa.`,`Peso máximo por eixo.`,`Nenhuma das anteriores.`],0,
 `Na série de regulamentação: R-14 é "Peso bruto total máximo permitido", R-15 é altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo.`,
 `R-14 = peso bruto TOTAL do veículo carregado. R-17 é o peso por EIXO.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-14`);
 
 Q(25, `Direção Defensiva`,
 `Nas retas, o motorista deve manter suas mãos no volante na posição:`,
@@ -1107,7 +1282,8 @@ Q(26, `Sinalização`,
 [`Uma passagem sinalizada de escolares.`,`Travessia de animais.`,`Proibido passagem de pedestres.`,`Passagem obrigatória para veículos escolares.`],0,
 `Na série de advertência, A-33a é "Passagem sinalizada de pedestres" e A-33b é "Passagem sinalizada de escolares", alertando para a travessia de crianças (normalmente perto de escolas). Placa de advertência nunca proíbe nem obriga: apenas adverte.`,
 `A-33b: crianças atravessando adiante – reduza e redobre a atenção.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-33b`);
 
 Q(26, `Direção Defensiva`,
 `Tempo de reação é aquele que transcorre entre:`,
@@ -1120,7 +1296,8 @@ Q(26, `Legislação`,
 [`Ao veículo que vier pela esquerda.`,`Ao veículo que seguir em frente.`,`Ao veículo 1, que está à direita do 2.`,`Ao veículo 2, porque o veículo 1 vai virar à esquerda.`],2,
 `Em cruzamento não sinalizado, a regra do CTB (art. 29, III) dá a preferência a quem vem pela DIREITA. Só existem duas exceções: rotatória (preferência de quem já está circulando) e via preferencial sinalizada.`,
 `Cruzamento sem sinalização: a preferência é de quem vem pela DIREITA.`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`CRUZAMENTO-1-2`);
 
 Q(26, `Meio Ambiente`,
 `Marque a alternativa incorreta. A emissão de gases poluentes:`,
@@ -1163,7 +1340,8 @@ Q(26, `Sinalização`,
 [`Proibido virar à esquerda.`,`Proibido seguir em frente.`,`Curva acentuada à direita.`,`Proibido virar à direita.`],3,
 `Na série de regulamentação, R-4a é "Proibido virar à esquerda" e R-4b é "Proibido virar à direita". Placas de regulamentação são circulares, com fundo branco, borda e tarja vermelhas.`,
 `R-4a = esquerda proibida; R-4b = direita proibida (a "b" vem depois, igual a direita).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-4b`);
 
 Q(26, `Direção Defensiva`,
 `Não constitui fundamento da direção defensiva:`,
@@ -1239,7 +1417,8 @@ Q(27, `Sinalização`,
 [`Uma área de estacionamento privado.`,`Uma praça de pedágio.`,`Um Drive Thru.`,`Um posto para abastecer seu veículo à distância indicada na placa.`],1,
 `As placas SAU (Serviços Auxiliares) informam serviços úteis ao usuário da via – hospital, posto de combustível, telefone, restaurante, pedágio, etc. A SAU-18 é a que indica a praça de pedágio adiante.`,
 `SAU = Serviço Auxiliar: o que existe de útil na via (posto, hospital, pedágio...).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Se a imagem do seu caderno mostrar uma bomba de combustível, a resposta correta é a alternativa D.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`SAU-18`);
 
 Q(27, `Primeiros Socorros`,
 `Não constitui procedimento correto com uma vítima em estado de choque:`,
@@ -1300,7 +1479,8 @@ Q(27, `Sinalização`,
 [`Área hospitalar.`,`Proibido ultrapassar.`,`Passagem obrigatória.`,`Proibido acionar buzina ou sinal sonoro.`],3,
 `A R-20 é "Proibido acionar buzina ou sinal sonoro", geralmente usada perto de hospitais e escolas. "Proibido ultrapassar" é a R-7.`,
 `R-20 = silêncio! Nada de buzina neste trecho.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-20`);
 
 Q(27, `Direção Defensiva`,
 `O condutor que, na direção do veículo, evita situações de acidentes ao trafegar com as devidas margens de segurança, está praticando uma direção defensiva:`,
@@ -1385,7 +1565,8 @@ Q(27, `Sinalização`,
 [`Passagem obrigatória.`,`Sentido único.`,`Sentido de circulação de via.`,`Siga em frente.`],1,
 `Na série de advertência, A-26a é "Sentido único" e A-26b é "Sentido duplo". São placas de advertência (losango amarelo) que informam como é a circulação da via adiante.`,
 `A-26a = sentido único; A-26b = sentido duplo.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-26a`);
 
 Q(27, `Direção Defensiva`,
 `Manter uma distância do veículo da frente é uma:`,
@@ -1413,7 +1594,8 @@ Q(28, `Sinalização`,
 [`Confluência à esquerda.`,`Confluência à direita.`,`Entroncamento oblíquo à esquerda.`,`Entroncamento oblíquo à direita.`],1,
 `Na série de advertência, A-13a é "Confluência à esquerda" e A-13b é "Confluência à direita". Confluência é a junção de duas correntes de tráfego no mesmo sentido – atenção com quem entra na sua via.`,
 `A-13a = confluência à esquerda; A-13b = confluência à direita.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-13b`);
 
 Q(28, `Mecânica`,
 `No sistema de arrefecimento não se utiliza o seguinte componente:`,
@@ -1438,7 +1620,8 @@ Q(28, `Sinalização`,
 [`Comprimento máximo permitido.`,`Largura máxima permitida.`,`Peso máximo permitido por eixo.`,`Altura máxima permitida.`],0,
 `Sequência das placas de regulamentação de limites: R-14 peso bruto total, R-15 altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo permitido.`,
 `R-15 altura, R-16 largura, R-17 peso por eixo, R-18 comprimento.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-18`);
 
 Q(28, `Meio Ambiente`,
 `Alguns cuidados que devemos ter com os veículos para reduzir a poluição do meio ambiente:`,
@@ -1490,10 +1673,11 @@ Q(28, `Cidadania`,
 
 Q(28, `Sinalização`,
 `A placa TAR-03 indica:`,
-[`Praia.`,`Parque urbano.`,`Área de estacionamento.`,`Patrimônio natural.`],0,
-`As placas TAR fazem parte da sinalização turística e indicam atrativos turísticos da região (praias, cachoeiras, parques, patrimônios). A TAR-03 corresponde ao atrativo "praia". Área de estacionamento não é sinalização turística, e sim de serviço auxiliar (SAU).`,
-`TAR = sinalização de atrativo turístico (praia, parque, patrimônio...).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Confira o pictograma no seu caderno: a resposta é o atrativo turístico desenhado na placa.`);
+[`Praia.`,`Parque urbano.`,`Área de estacionamento.`,`Patrimônio natural.`],1,
+`As placas TAR são da sinalização turística (fundo marrom) e indicam atrativos da região. A TAR-03 está no grupo "áreas de recreação" e corresponde ao PARQUE URBANO. Área de estacionamento não é sinalização turística, e sim de serviço auxiliar (SAU).`,
+`Fundo marrom = turismo. TAR-03 é o parque urbano (árvore e banco de praça).`,
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`TAR-03`);
 
 Q(28, `Mecânica`,
 `Debrear é o mesmo que:`,
@@ -1584,7 +1768,8 @@ Q(28, `Sinalização`,
 [`Reduzir a velocidade, adotando as medidas de precaução para imobilizar o veículo.`,`Frear bruscamente.`,`Aumentar a velocidade para passar logo.`,`Continuar na mesma velocidade.`],0,
 `Diante da luz amarela, o condutor deve reduzir a velocidade e se preparar para parar antes da faixa de retenção. Frear bruscamente causa colisão traseira e acelerar para "passar antes de fechar" é infração gravíssima.`,
 `Amarelo = atenção, prepare-se para parar (sem freada brusca).`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`SEMAFORO-AMARELO`);
 
 Q(28, `Legislação`,
 `O condutor estando à noite em uma via urbana com iluminação pública deve:`,
@@ -1601,6 +1786,14 @@ Q(28, `Legislação`,
   const LETRAS = ["A","B","C","D"];
   const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
                     25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
+  const LEGENDAS = {
+    "A-17":"Placa A-17", "A-26a":"Placa A-26a", "A-13b":"Placa A-13b", "A-33b":"Placa A-33b",
+    "R-4b":"Placa R-4b", "R-20":"Placa R-20", "R-14":"Placa R-14", "R-18":"Placa R-18",
+    "SAU-18":"Placa SAU-18", "TAR-03":"Placa TAR-03",
+    "SEMAFORO-AMARELO":"Sinalização semafórica",
+    "AGENTE-LANTERNA":"Gesto do agente à noite",
+    "CRUZAMENTO-1-2":"Cruzamento sem sinalização"
+  };
 
   /* ---------- estado ---------- */
   let selCad = [], selTema = [], selQtd = 30, selEmb = false;
@@ -1733,6 +1926,12 @@ Q(28, `Legislação`,
       '<span class="tag">Questão ' + (idx+1) + ' de ' + fila.length + '</span>';
 
     $("enunciado").textContent = q.e;
+
+    if (q.img && IMAGENS[q.img]){
+      $("figImg").innerHTML = IMAGENS[q.img];
+      $("figCap").textContent = LEGENDAS[q.img] || q.img;
+      $("figura").classList.remove("hidden");
+    } else $("figura").classList.add("hidden");
 
     if (q.nota){ $("nota").textContent = "ℹ️ " + q.nota; $("nota").classList.remove("hidden"); }
     else $("nota").classList.add("hidden");

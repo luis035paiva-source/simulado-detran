@@ -5,7 +5,7 @@
 const fs = require("fs");
 const path = require("path");
 
-const ARQUIVOS = ["00-base", "19", "20", "21", "25", "26", "27", "28"];
+const ARQUIVOS = ["00-base", "imagens", "19", "20", "21", "25", "26", "27", "28"];
 
 const dados = ARQUIVOS
   .map(f => fs.readFileSync(path.join(__dirname, "dados", f + ".js"), "utf8"))

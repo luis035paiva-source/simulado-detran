@@ -5,7 +5,8 @@ Q(28, `Sinalização`,
 [`Confluência à esquerda.`,`Confluência à direita.`,`Entroncamento oblíquo à esquerda.`,`Entroncamento oblíquo à direita.`],1,
 `Na série de advertência, A-13a é "Confluência à esquerda" e A-13b é "Confluência à direita". Confluência é a junção de duas correntes de tráfego no mesmo sentido – atenção com quem entra na sua via.`,
 `A-13a = confluência à esquerda; A-13b = confluência à direita.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`A-13b`);
 
 Q(28, `Mecânica`,
 `No sistema de arrefecimento não se utiliza o seguinte componente:`,
@@ -30,7 +31,8 @@ Q(28, `Sinalização`,
 [`Comprimento máximo permitido.`,`Largura máxima permitida.`,`Peso máximo permitido por eixo.`,`Altura máxima permitida.`],0,
 `Sequência das placas de regulamentação de limites: R-14 peso bruto total, R-15 altura máxima, R-16 largura máxima, R-17 peso máximo por eixo e R-18 comprimento máximo permitido.`,
 `R-15 altura, R-16 largura, R-17 peso por eixo, R-18 comprimento.`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF; a resposta foi dada pelo código oficial da placa.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`R-18`);
 
 Q(28, `Meio Ambiente`,
 `Alguns cuidados que devemos ter com os veículos para reduzir a poluição do meio ambiente:`,
@@ -82,10 +84,11 @@ Q(28, `Cidadania`,
 
 Q(28, `Sinalização`,
 `A placa TAR-03 indica:`,
-[`Praia.`,`Parque urbano.`,`Área de estacionamento.`,`Patrimônio natural.`],0,
-`As placas TAR fazem parte da sinalização turística e indicam atrativos turísticos da região (praias, cachoeiras, parques, patrimônios). A TAR-03 corresponde ao atrativo "praia". Área de estacionamento não é sinalização turística, e sim de serviço auxiliar (SAU).`,
-`TAR = sinalização de atrativo turístico (praia, parque, patrimônio...).`,
-`A questão original vinha acompanhada da imagem da placa, que não está disponível no PDF. Confira o pictograma no seu caderno: a resposta é o atrativo turístico desenhado na placa.`);
+[`Praia.`,`Parque urbano.`,`Área de estacionamento.`,`Patrimônio natural.`],1,
+`As placas TAR são da sinalização turística (fundo marrom) e indicam atrativos da região. A TAR-03 está no grupo "áreas de recreação" e corresponde ao PARQUE URBANO. Área de estacionamento não é sinalização turística, e sim de serviço auxiliar (SAU).`,
+`Fundo marrom = turismo. TAR-03 é o parque urbano (árvore e banco de praça).`,
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`TAR-03`);
 
 Q(28, `Mecânica`,
 `Debrear é o mesmo que:`,
@@ -176,7 +179,8 @@ Q(28, `Sinalização`,
 [`Reduzir a velocidade, adotando as medidas de precaução para imobilizar o veículo.`,`Frear bruscamente.`,`Aumentar a velocidade para passar logo.`,`Continuar na mesma velocidade.`],0,
 `Diante da luz amarela, o condutor deve reduzir a velocidade e se preparar para parar antes da faixa de retenção. Frear bruscamente causa colisão traseira e acelerar para "passar antes de fechar" é infração gravíssima.`,
 `Amarelo = atenção, prepare-se para parar (sem freada brusca).`,
-`A questão original vinha acompanhada de uma imagem que não está disponível no PDF.`);
+`Ilustração recriada aqui no padrão oficial do CONTRAN — o PDF do caderno não trazia a imagem.`,
+`SEMAFORO-AMARELO`);
 
 Q(28, `Legislação`,
 `O condutor estando à noite em uma via urbana com iluminação pública deve:`,

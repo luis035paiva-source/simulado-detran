@@ -5,10 +5,11 @@
    no CTB (Código de Trânsito Brasileiro) e no conteúdo programático do DETRAN.
 
    c = índice da alternativa correta (0=A, 1=B, 2=C, 3=D)
-   nota = observação exibida junto da questão (ex.: questão que dependia de imagem) */
+   nota = observação exibida junto da questão
+   img  = chave de uma ilustração de dados/imagens.js (placa, semáforo etc.) */
 
 const QUESTOES = [];
 
-function Q(caderno, tema, e, alts, c, exp, mac, nota) {
-  QUESTOES.push({ caderno, tema, e, alts, c, exp, mac, nota });
+function Q(caderno, tema, e, alts, c, exp, mac, nota, img) {
+  QUESTOES.push({ caderno, tema, e, alts, c, exp, mac, nota, img });
 }
