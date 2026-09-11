@@ -29,12 +29,14 @@ Como funciona
 - Também aparece o percentual de acerto de primeira tentativa e a lista
   das questões que você errou, com um botão para treinar só elas.
 
-Conteúdo: 295 questões, todas com gabarito e explicação salvos dentro do
+Conteúdo: 385 questões, todas com gabarito e explicação salvos dentro do
 próprio arquivo:
 - Cadernos 19, 20, 21, 25, 26, 27 e 28 (210 questões);
-- Provas 01, 02 e 03 do caderno "Provas Simuladas" (85 questões sobre
-  Sistema Nacional de Trânsito, Processo de Habilitação e Veículos),
-  com as respostas conferidas contra o gabarito oficial do caderno.
+- Provas 01, 02, 03, 12, 13 e 14 do caderno "Provas Simuladas"
+  (175 questões: Sistema Nacional de Trânsito, Processo de Habilitação,
+  Veículos, Primeiros Socorros, Meio Ambiente e Mecânica), com as
+  respostas conferidas uma a uma contra o gabarito oficial do caderno.
+Quando a rodada mistura cadernos, o site remove os enunciados repetidos.
 
 Para editar/adicionar questões
 ------------------------------

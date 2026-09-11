@@ -300,11 +300,13 @@ kbd{background:var(--card2);border:1px solid var(--line);border-bottom-width:2px
 
   const $ = id => document.getElementById(id);
   const LETRAS = ["A","B","C","D"];
-  const NOME_CAD = {1:"Sistema Nacional de Trânsito",2:"Processo de Habilitação",3:"Veículos e documentos",
-                    19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
-                    25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral"};
-  // provas novas usam números baixos e aparecem como "Prova 01"; os cadernos antigos, como "Caderno 19"
-  const rotulo = c => (c < 10 ? "Prova " + String(c).padStart(2,"0") : "Caderno " + c);
+  const NOME_CAD = {19:"Direção Defensiva",20:"Direção Defensiva",21:"Direção Defensiva",
+                    25:"Prova Geral",26:"Prova Geral",27:"Prova Geral",28:"Prova Geral",
+                    101:"Sistema Nacional de Trânsito",102:"Processo de Habilitação",
+                    103:"Veículos e documentos",112:"Primeiros Socorros",
+                    113:"Meio Ambiente e convívio social",114:"Noções de Mecânica"};
+  // as provas do caderno "Provas Simuladas" usam 100+ e aparecem como "Prova 12"
+  const rotulo = c => (c > 100 ? "Prova " + String(c-100).padStart(2,"0") : "Caderno " + c);
   const LEGENDAS = {
     "A-17":"Placa A-17", "A-26a":"Placa A-26a", "A-13b":"Placa A-13b", "A-33b":"Placa A-33b",
     "R-4b":"Placa R-4b", "R-20":"Placa R-20", "R-14":"Placa R-14", "R-18":"Placa R-18",
